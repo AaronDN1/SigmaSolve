@@ -22,34 +22,62 @@ Prioritize teaching, clarity, and academic honesty over shortcut answers.
 """.strip()
 
 
-def _build_file_input(upload: UploadedFile) -> list[dict]:
+def _build_file_input(upload: UploadedFile) -> dict[str, str | dict]:
     context = extract_file_context(upload)
     if context["type"] == "image":
-        return [{"type": "image_url", "image_url": {"url": context["data_url"]}}]
-    return [{"type": "text", "text": f"File context from {upload.original_name}:\n{context['text']}"}]
+        return {"type": "image_url", "image_url": {"url": context["data_url"]}}
+    return {"type": "text", "text": f"File context from {upload.original_name}:\n{context['text']}"}
 
 
-def _create_chat_completion(user_content: list[dict]) -> str:
-    response = client.chat.completions.create(
-        model=settings.openai_model,
-        messages=[
-            {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
-            {"role": "user", "content": user_content},
-        ],
-    )
+def _create_chat_completion(prompt_text: str, uploads: list[UploadedFile]) -> str:
+    text_sections = [prompt_text]
+    image_parts = []
+
+    for upload in uploads:
+        file_input = _build_file_input(upload)
+        if file_input["type"] == "image_url":
+            image_parts.append(file_input)
+        else:
+            text_sections.append(file_input["text"])
+
+    full_text_prompt = "\n\n".join(text_sections)
+
+    try:
+        if image_parts:
+            response = client.chat.completions.create(
+                model=settings.openai_model,
+                messages=[
+                    {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
+                    {"role": "user", "content": [{"type": "text", "text": full_text_prompt}, *image_parts]},
+                ],
+            )
+        else:
+            response = client.chat.completions.create(
+                model=settings.openai_model,
+                messages=[
+                    {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
+                    {"role": "user", "content": full_text_prompt},
+                ],
+            )
+    except Exception:
+        fallback_prompt = full_text_prompt
+        if image_parts:
+            fallback_prompt = f"{full_text_prompt}\n\nOne or more image uploads were provided as context."
+        response = client.chat.completions.create(
+            model=settings.openai_model,
+            messages=[
+                {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
+                {"role": "user", "content": fallback_prompt},
+            ],
+        )
+
     text = response.choices[0].message.content or ""
     return text.strip()
 
 
 def generate_prompt_response(db: Session, user: User, request: PromptRequest, uploads: list[UploadedFile]) -> str:
-    content = [
-        {"type": "text", "text": f"Subject: {request.subject}"},
-        {"type": "text", "text": request.prompt},
-    ]
-    for upload in uploads:
-        content.extend(_build_file_input(upload))
-
-    text = _create_chat_completion(content)
+    prompt_text = f"Subject: {request.subject}\n\n{request.prompt}"
+    text = _create_chat_completion(prompt_text, uploads)
     db.add(GeneratedOutput(user_id=user.id, output_type=OutputType.AI_PROMPT, title=request.subject, content=text))
     db.commit()
     return text
@@ -80,11 +108,7 @@ Use this structure:
 Be formal, specific, and make use of the supplied details and file context.
 """.strip()
 
-    content = [{"type": "text", "text": prompt}]
-    for upload in uploads:
-        content.extend(_build_file_input(upload))
-
-    text = _create_chat_completion(content)
+    text = _create_chat_completion(prompt, uploads)
     db.add(
         GeneratedOutput(
             user_id=user.id,
