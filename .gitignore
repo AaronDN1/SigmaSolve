@@ -1,0 +1,34 @@
+# Env (VERY IMPORTANT)
+.env
+.env.*
+backend/.env
+frontend/.env.local
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Node / Next
+node_modules/
+.next/
+
+# Logs
+*.log
+
+# Storage (user uploads & generated files)
+backend/storage/uploads/*
+backend/storage/graphs/*
+!backend/storage/uploads/.gitkeep
+!backend/storage/graphs/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
