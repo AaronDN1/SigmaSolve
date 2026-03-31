@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -59,7 +59,10 @@ def upload_file(
 def prompt_tool(payload: PromptRequest, user=Depends(get_current_user), db: Session = Depends(get_db)):
     ensure_usage_available(db, user)
     uploads = db.query(UploadedFile).filter(UploadedFile.user_id == user.id, UploadedFile.id.in_(payload.file_ids)).all()
-    content = generate_prompt_response(db, user, payload, uploads)
+    try:
+        content = generate_prompt_response(db, user, payload, uploads)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"OpenAI prompt failed: {exc}") from exc
     usage_remaining = record_usage(db, user, "ai_prompt")
     return {"content": content, "usage_remaining": usage_remaining}
 

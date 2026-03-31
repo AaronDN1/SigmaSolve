@@ -1,3 +1,7 @@
+from pathlib import Path
+
+import openai
+from fastapi import HTTPException
 from openai import OpenAI
 from sqlalchemy.orm import Session
 
@@ -10,6 +14,12 @@ from app.services.files import extract_file_context
 
 
 client = OpenAI(api_key=settings.openai_api_key)
+
+print(f"[SigmaSolve] openai_service loaded from: {Path(__file__).resolve()}")
+print(f"[SigmaSolve] openai package path: {getattr(openai, '__file__', 'unknown')}")
+print(f"[SigmaSolve] openai package version: {getattr(openai, '__version__', 'unknown')}")
+print(f"[SigmaSolve] OpenAI client has .chat: {hasattr(client, 'chat')}")
+print(f"[SigmaSolve] OpenAI client has .responses: {hasattr(client, 'responses')}")
 
 DEFAULT_SYSTEM_PROMPT = """
 You are Sigma Solve, a patient STEM professor and tutor.
@@ -29,55 +39,24 @@ def _build_file_input(upload: UploadedFile) -> dict[str, str | dict]:
     return {"type": "text", "text": f"File context from {upload.original_name}:\n{context['text']}"}
 
 
-def _create_chat_completion(prompt_text: str, uploads: list[UploadedFile]) -> str:
-    text_sections = [prompt_text]
-    image_parts = []
-
-    for upload in uploads:
-        file_input = _build_file_input(upload)
-        if file_input["type"] == "image_url":
-            image_parts.append(file_input)
-        else:
-            text_sections.append(file_input["text"])
-
-    full_text_prompt = "\n\n".join(text_sections)
-
-    try:
-        if image_parts:
-            response = client.chat.completions.create(
-                model=settings.openai_model,
-                messages=[
-                    {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
-                    {"role": "user", "content": [{"type": "text", "text": full_text_prompt}, *image_parts]},
-                ],
-            )
-        else:
-            response = client.chat.completions.create(
-                model=settings.openai_model,
-                messages=[
-                    {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
-                    {"role": "user", "content": full_text_prompt},
-                ],
-            )
-    except Exception:
-        fallback_prompt = full_text_prompt
-        if image_parts:
-            fallback_prompt = f"{full_text_prompt}\n\nOne or more image uploads were provided as context."
-        response = client.chat.completions.create(
-            model=settings.openai_model,
-            messages=[
-                {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
-                {"role": "user", "content": fallback_prompt},
-            ],
-        )
-
+def _create_chat_completion(prompt_text: str) -> str:
+    response = client.chat.completions.create(
+        model=settings.openai_model,
+        messages=[
+            {"role": "system", "content": DEFAULT_SYSTEM_PROMPT},
+            {"role": "user", "content": prompt_text},
+        ],
+    )
     text = response.choices[0].message.content or ""
     return text.strip()
 
 
 def generate_prompt_response(db: Session, user: User, request: PromptRequest, uploads: list[UploadedFile]) -> str:
     prompt_text = f"Subject: {request.subject}\n\n{request.prompt}"
-    text = _create_chat_completion(prompt_text, uploads)
+    try:
+        text = _create_chat_completion(prompt_text)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"OpenAI prompt failed: {str(e)}") from e
     db.add(GeneratedOutput(user_id=user.id, output_type=OutputType.AI_PROMPT, title=request.subject, content=text))
     db.commit()
     return text
@@ -108,7 +87,20 @@ Use this structure:
 Be formal, specific, and make use of the supplied details and file context.
 """.strip()
 
-    text = _create_chat_completion(prompt, uploads)
+    text_file_context = []
+    for upload in uploads:
+        context = extract_file_context(upload)
+        if context["type"] == "text":
+            text_file_context.append(f"File context from {upload.original_name}:\n{context['text']}")
+
+    full_prompt = prompt
+    if text_file_context:
+        full_prompt = f"{prompt}\n\n" + "\n\n".join(text_file_context)
+
+    try:
+        text = _create_chat_completion(full_prompt)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"OpenAI prompt failed: {str(e)}") from e
     db.add(
         GeneratedOutput(
             user_id=user.id,
