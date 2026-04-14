@@ -17,6 +17,7 @@ from app.schemas.workspace import (
     PromptConversationThreadResponse,
     PromptConversationThreadSummary,
 )
+from app.services.analytics import capture_analytics_event
 from app.services.openai_service import create_thread_completion
 
 
@@ -90,6 +91,7 @@ def create_prompt_thread(
     subject: str,
     prompt: str,
     uploads: list[UploadedFile],
+    session_id: str | None = None,
 ) -> tuple[PromptConversationThread, str]:
     assistant_content = create_thread_completion(subject=subject, prompt=prompt, uploads=uploads)
     now = datetime.utcnow()
@@ -128,6 +130,31 @@ def create_prompt_thread(
         ]
     )
     db.commit()
+    capture_analytics_event(
+        "thread_created",
+        distinct_id=str(user.id),
+        properties={
+            "user_id": str(user.id),
+            "thread_id": str(thread.id),
+            "session_id": session_id,
+            "subject": subject,
+            "feature_name": "ai_prompt",
+            "message_count": 2,
+        },
+    )
+    capture_analytics_event(
+        "message_appended",
+        distinct_id=str(user.id),
+        properties={
+            "user_id": str(user.id),
+            "thread_id": str(thread.id),
+            "session_id": session_id,
+            "subject": subject,
+            "feature_name": "ai_prompt",
+            "messages_added": 2,
+            "thread_message_count": 2,
+        },
+    )
     return get_thread_or_404(db, user, thread.id), assistant_content
 
 
@@ -137,6 +164,7 @@ def continue_prompt_thread(
     thread_id: UUID,
     prompt: str,
     uploads: list[UploadedFile],
+    session_id: str | None = None,
 ) -> tuple[PromptConversationThread, str]:
     thread = get_thread_or_404(db, user, thread_id)
     ordered_messages = sorted(thread.messages, key=lambda message: message.created_at)
@@ -174,6 +202,19 @@ def continue_prompt_thread(
     )
     thread.updated_at = assistant_at
     db.commit()
+    capture_analytics_event(
+        "message_appended",
+        distinct_id=str(user.id),
+        properties={
+            "user_id": str(user.id),
+            "thread_id": str(thread.id),
+            "session_id": session_id,
+            "subject": thread.subject,
+            "feature_name": "ai_prompt",
+            "messages_added": 2,
+            "thread_message_count": len(ordered_messages) + 2,
+        },
+    )
     return get_thread_or_404(db, user, thread.id), assistant_content
 
 

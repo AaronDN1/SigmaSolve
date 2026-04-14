@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Manrope } from "next/font/google";
 
+import { AnalyticsBoot } from "@/components/shared/analytics-boot";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 
 import "./globals.css";
@@ -26,7 +27,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${manrope.variable}`}>
       <body className="font-sans antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <AnalyticsBoot />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -75,14 +75,28 @@ def upload_file(
 
 
 @router.post("/prompt", response_model=PromptResponse)
-def prompt_tool(payload: PromptRequest, user=Depends(get_current_user), db: Session = Depends(get_db)):
+def prompt_tool(payload: PromptRequest, request: Request, user=Depends(get_current_user), db: Session = Depends(get_db)):
     ensure_usage_available(db, user)
     uploads = db.query(UploadedFile).filter(UploadedFile.user_id == user.id, UploadedFile.id.in_(payload.file_ids)).all()
     try:
         if payload.thread_id:
-            thread, content = continue_prompt_thread(db, user, payload.thread_id, payload.prompt, uploads)
+            thread, content = continue_prompt_thread(
+                db,
+                user,
+                payload.thread_id,
+                payload.prompt,
+                uploads,
+                session_id=request.headers.get("x-sigma-session-id"),
+            )
         else:
-            thread, content = create_prompt_thread(db, user, payload.subject, payload.prompt, uploads)
+            thread, content = create_prompt_thread(
+                db,
+                user,
+                payload.subject,
+                payload.prompt,
+                uploads,
+                session_id=request.headers.get("x-sigma-session-id"),
+            )
     except HTTPException:
         raise
     except Exception as exc:
@@ -92,11 +106,18 @@ def prompt_tool(payload: PromptRequest, user=Depends(get_current_user), db: Sess
 
 
 @router.post("/prompt/threads", response_model=PromptResponse)
-def create_prompt_thread_route(payload: PromptRequest, user=Depends(get_current_user), db: Session = Depends(get_db)):
+def create_prompt_thread_route(payload: PromptRequest, request: Request, user=Depends(get_current_user), db: Session = Depends(get_db)):
     ensure_usage_available(db, user)
     uploads = db.query(UploadedFile).filter(UploadedFile.user_id == user.id, UploadedFile.id.in_(payload.file_ids)).all()
     try:
-        thread, content = create_prompt_thread(db, user, payload.subject, payload.prompt, uploads)
+        thread, content = create_prompt_thread(
+            db,
+            user,
+            payload.subject,
+            payload.prompt,
+            uploads,
+            session_id=request.headers.get("x-sigma-session-id"),
+        )
     except HTTPException:
         raise
     except Exception as exc:
@@ -109,13 +130,21 @@ def create_prompt_thread_route(payload: PromptRequest, user=Depends(get_current_
 def continue_prompt_thread_route(
     thread_id: UUID,
     payload: PromptContinueRequest,
+    request: Request,
     user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     ensure_usage_available(db, user)
     uploads = db.query(UploadedFile).filter(UploadedFile.user_id == user.id, UploadedFile.id.in_(payload.file_ids)).all()
     try:
-        thread, content = continue_prompt_thread(db, user, thread_id, payload.prompt, uploads)
+        thread, content = continue_prompt_thread(
+            db,
+            user,
+            thread_id,
+            payload.prompt,
+            uploads,
+            session_id=request.headers.get("x-sigma-session-id"),
+        )
     except HTTPException:
         raise
     except Exception as exc:

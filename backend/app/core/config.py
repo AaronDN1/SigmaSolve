@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     upload_dir: Path = STORAGE_ROOT / "uploads"
     graphs_dir: Path = STORAGE_ROOT / "graphs"
     free_daily_limit: int = 20
+    analytics_enabled: bool = False
+    posthog_host: str = "https://us.i.posthog.com"
+    posthog_project_api_key: str = ""
+    analytics_slow_request_ms: int = 4000
 
     @field_validator("backend_cors_origins", mode="before")
     @classmethod

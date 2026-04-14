@@ -19,6 +19,16 @@ import { ResponseRenderer } from "@/components/app/response-renderer";
 import { UploadPanel } from "@/components/app/upload-panel";
 import { SettingsModal } from "@/components/shared/settings-modal";
 import { Button } from "@/components/shared/button";
+import {
+  openFeature,
+  trackAiPromptSubmitted,
+  trackAiResponseReceived,
+  trackGraphGenerated,
+  trackGraphingStarted,
+  trackLabHelperCompleted,
+  trackLabHelperStarted,
+  trackThreadLoaded,
+} from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import {
   continuePromptThread,
@@ -137,6 +147,10 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
     container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
   }, [activeTab, conversationMessages.length, loadingAction, activeThread?.id]);
 
+  useEffect(() => {
+    openFeature(activeTab);
+  }, [activeTab]);
+
   function updateUsage(remaining: number | null) {
     if (remaining === null) return;
     setUsageState((current) => ({
@@ -193,6 +207,11 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
       setActiveThread(thread);
       setPromptForm((current) => ({ ...current, subject: thread.subject, prompt: "" }));
       setHistoryOpen(false);
+      trackThreadLoaded({
+        thread_id: thread.id,
+        subject: thread.subject,
+        message_count: thread.messages.length,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load conversation.");
     } finally {
@@ -218,6 +237,15 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
 
     setLoadingAction(true);
     setError("");
+    const startedAt = performance.now();
+    const isNewThread = !activeThread;
+    trackAiPromptSubmitted({
+      feature_name: "ai_prompt",
+      thread_id: activeThread?.id ?? null,
+      subject: activeThread?.subject ?? promptForm.subject,
+      file_count: promptFiles.length,
+      is_new_thread: isNewThread,
+    });
     try {
       const result = activeThread
         ? await continuePromptThread(activeThread.id, {
@@ -236,6 +264,14 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
       setPromptFiles([]);
       updateUsage(result.usage_remaining);
       await refreshPromptLists();
+      trackAiResponseReceived({
+        feature_name: "ai_prompt",
+        thread_id: result.thread.id,
+        subject: result.thread.subject,
+        response_time_ms: Math.round(performance.now() - startedAt),
+        message_count: result.thread.messages.length,
+        is_new_thread: isNewThread,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to generate explanation.");
     } finally {
@@ -246,12 +282,24 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
   async function handleLabSubmit() {
     setLoadingAction(true);
     setError("");
+    const startedAt = performance.now();
+    trackLabHelperStarted({
+      feature_name: "lab_helper",
+      subject: labForm.subject,
+      file_count: labFiles.length,
+    });
     try {
       const result = await runLabHelper({ ...labForm, file_ids: labFiles.map((file) => file.id) });
       setActiveThread(null);
       setGraphUrl("");
       setResponse(result.content);
       updateUsage(result.usage_remaining);
+      trackLabHelperCompleted({
+        feature_name: "lab_helper",
+        subject: labForm.subject,
+        response_time_ms: Math.round(performance.now() - startedAt),
+        file_count: labFiles.length,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to draft lab report.");
     } finally {
@@ -262,6 +310,13 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
   async function handleGraphSubmit() {
     setLoadingAction(true);
     setError("");
+    const startedAt = performance.now();
+    trackGraphingStarted({
+      feature_name: "graphing",
+      graph_type: graphForm.graph_type,
+      has_equation: Boolean(graphForm.equation),
+      series_count: graphForm.rawX.trim() && graphForm.rawY.trim() ? 1 : 0,
+    });
     try {
       const x = graphForm.rawX.split(",").map((value) => Number(value.trim())).filter((value) => !Number.isNaN(value));
       const y = graphForm.rawY.split(",").map((value) => Number(value.trim())).filter((value) => !Number.isNaN(value));
@@ -280,6 +335,12 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
       setResponse("");
       setGraphUrl(result.image_url);
       updateUsage(result.usage_remaining);
+      trackGraphGenerated({
+        feature_name: "graphing",
+        graph_type: graphForm.graph_type,
+        response_time_ms: Math.round(performance.now() - startedAt),
+        has_equation: Boolean(graphForm.equation),
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to generate graph.");
     } finally {

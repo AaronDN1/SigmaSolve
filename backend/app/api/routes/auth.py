@@ -5,6 +5,7 @@ from app.api.deps import build_user_response, get_current_user
 from app.core.config import settings
 from app.db.session import get_db
 from app.schemas.auth import GoogleSignInRequest, SessionResponse
+from app.services.analytics import capture_analytics_event
 from app.services.auth import create_session_token, get_or_create_user_from_google, verify_google_credential
 
 
@@ -20,6 +21,14 @@ def google_sign_in(payload: GoogleSignInRequest, response: Response, db: Session
 
     user = get_or_create_user_from_google(db, claims)
     token = create_session_token(user)
+    capture_analytics_event(
+        "user_signed_in",
+        distinct_id=str(user.id),
+        properties={
+            "user_id": str(user.id),
+            "auth_provider": "google",
+        },
+    )
     response.set_cookie(
         key=settings.session_cookie_name,
         value=token,
