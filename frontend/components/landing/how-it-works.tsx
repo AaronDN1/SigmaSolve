@@ -21,14 +21,13 @@ const steps = [
 export function HowItWorks() {
   return (
     <section id="how-it-works" className="px-6 py-24 lg:px-8">
-      <div className="mx-auto max-w-7xl space-y-12">
+      <div className="mx-auto max-w-7xl space-y-10">
         <SectionHeading
           eyebrow="Workflow"
           title="A simple flow that still feels premium."
-          description="The product stays clean and direct, while the backend still handles real state, uploads, prompt limits, and generation services behind the scenes."
         />
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-3">
           {steps.map((step) => (
             <article key={step.number} className="rounded-[1.75rem] border border-slate-200/70 bg-white p-7 shadow-soft dark:border-white/10 dark:bg-slate-950/50">
               <p className="text-sm font-semibold tracking-[0.3em] text-brand-500">{step.number}</p>

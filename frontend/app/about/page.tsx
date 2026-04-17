@@ -1,28 +1,63 @@
 import Link from "next/link";
+import { ArrowRight, BrainCircuit, BriefcaseBusiness, Boxes, Sparkles } from "lucide-react";
 
 import { MarketingNav } from "@/components/landing/marketing-nav";
 import { Button } from "@/components/shared/button";
 
-const sections = [
+const focusAreas = [
+  "AI integration",
+  "Prompt engineering",
+  "Frontend and backend development",
+  "Workflow and product design",
+  "Systems thinking",
+  "Data-driven iteration"
+];
+
+const profileHighlights = [
   {
-    title: "Who I Am",
-    body:
-      "I am building SigmaSolve as a focused product for students who want academic help that feels rigorous, readable, and actually useful. I care about shipping software that respects the user, solves a narrow problem well, and leaves room for thoughtful iteration instead of noise."
+    label: "Education",
+    value: "B.S. Physics, May 2026"
   },
   {
-    title: "What SigmaSolve Is",
-    body:
-      "SigmaSolve is a STEM-focused AI workspace for long-form problem solving, lab report drafting, and graph generation. The goal is not to be a generic chatbot. It is to feel more like a polished study environment that helps students understand material, organize work, and produce cleaner outputs."
+    label: "Graduate Study",
+    value: "M.E. Applied Artificial Intelligence, December 2026"
   },
   {
-    title: "My Technical Interests",
+    label: "Career Direction",
+    value: "AI engineering, ML, and applied AI roles"
+  }
+];
+
+const detailSections = [
+  {
+    eyebrow: "What I Built",
+    title: "The SigmaSolve Project.",
     body:
-      "I am especially interested in applied AI products, human-centered interface design, developer tooling, and systems that turn complex workflows into something calm and intuitive. I enjoy working across frontend and backend boundaries, tightening product details, and making technical products feel more legible to real users."
+      "I built SigmaSolve as a focused AI workspace for STEM students who need clearer problem solving, better explanations, and cleaner outputs. That meant shaping the product from end to end: workflow design, AI model selection and integration, prompt behavior, frontend and backend implementation decisions, threaded conversations, analytics, usage controls, and the math-rendering and UX details that make the experience usable instead of frustrating."
   },
   {
-    title: "What I Am Looking For",
+    eyebrow: "Execution Story",
+    title: "The idea was there before the acceleration.",
     body:
-      "I am interested in internships and early-career software roles where I can contribute to ambitious product engineering, learn from strong technical teams, and keep growing across product thinking, full-stack development, and AI-enabled systems. This page is intentionally editable so it can evolve alongside the project and the opportunities I pursue."
+      "I had the idea for SigmaSolve for a while and made multiple attempts to build a version I actually liked. The turning point came after I found the Codex challenge on Handshake. Codex accelerated execution, iteration, and debugging, but it did not replace engineering judgment. I knew what I wanted to build, how I wanted it to work, and used AI tooling as leverage to turn that into a real product faster."
+  },
+  {
+    eyebrow: "What I Work On",
+    title: "I like technical work that connects product thinking to systems reality.",
+    body:
+      "I am especially interested in building intelligent systems that have to work under real constraints: clear interfaces, reliable backend behavior, good user feedback loops, and outputs that are actually understandable. The part I enjoy most is taking a messy problem, designing a strong workflow around it, and then implementing the details well enough that the product feels coherent."
+  },
+  {
+    eyebrow: "What I'm Looking For",
+    title: "I am looking for opportunities where I can help build useful AI systems.",
+    body:
+      "I am seeking roles in AI engineering, machine learning, and applied AI, especially on teams building real-world products rather than demos. I want to work on systems that combine model capability, sound engineering, and product clarity."
+  },
+  {
+    eyebrow: "Interests",
+    title: "I am especially interested in building and improving intelligent systems.",
+    body:
+      "That includes AI engineering, engineering more broadly, training and developing models, and the product and infrastructure work required to make those systems useful. I am drawn to work that combines technical depth with practical execution."
   }
 ];
 
@@ -31,39 +66,104 @@ export default function AboutPage() {
     <main className="min-h-screen">
       <MarketingNav />
       <section className="px-6 pb-24 pt-14 lg:px-8 lg:pt-20">
-        <div className="mx-auto max-w-5xl space-y-8">
-          <div className="glass-panel rounded-[2rem] p-8 md:p-10">
-            <div className="inline-flex items-center rounded-full border border-brand-100 bg-brand-50/80 px-4 py-2 text-sm font-semibold text-brand-600 dark:border-white/10 dark:bg-white/5 dark:text-brand-100">
-              Recruiter-facing overview
-            </div>
-            <h1 className="mt-6 font-serif text-5xl leading-tight text-ink dark:text-white md:text-6xl">
-              Building SigmaSolve with product taste, technical depth, and room to grow.
-            </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-              This page is a professional placeholder that explains the project, my interests, and the kind of roles I
-              am exploring. It is written to stay realistic, editable, and easy to tailor for conversations with
-              recruiters and hiring teams.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/app">
-                <Button>Open SigmaSolve</Button>
-              </Link>
-              <Link href="/">
-                <Button variant="secondary" className="dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10">
-                  Back to product
-                </Button>
-              </Link>
-            </div>
-          </div>
+        <div className="mx-auto max-w-6xl space-y-8">
+          <section className="glass-panel overflow-hidden rounded-[2.25rem] p-8 md:p-10">
+            <div className="grid gap-8 lg:grid-cols-[1.35fr_0.65fr] lg:items-start">
+              <div>
+                <h1 className="max-w-4xl font-serif text-5xl leading-tight text-ink dark:text-white md:text-6xl">
+                  Aaron Nathans
+                </h1>
+                <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+                  I am a student engineer focused on intelligent systems, product execution, and turning technically complex ideas into software that feels clear and useful. SigmaSolve is the best example of how I work: identify a real workflow, design it intentionally, and then build the system behind it well enough that the user experience holds together.
+                </p>
+                <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600 dark:text-slate-300">
+                  I graduate in May 2026 with a B.S. in Physics and in December 2026 with an M.E. in Applied Artificial Intelligence. I am looking for opportunities across AI engineering, machine learning, and applied AI.
+                </p>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {sections.map((section) => (
-              <article key={section.title} className="glass-panel rounded-[1.75rem] p-7">
-                <h2 className="text-2xl font-semibold text-ink dark:text-white">{section.title}</h2>
-                <p className="mt-4 text-base leading-8 text-slate-600 dark:text-slate-300">{section.body}</p>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  {focusAreas.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-slate-950/40 dark:text-slate-200"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <Link href="/app">
+                    <Button>
+                      Open SigmaSolve
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/">
+                    <Button
+                      variant="secondary"
+                      className="dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+                    >
+                      Back to product
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              <aside className="space-y-4">
+                <div className="rounded-[1.75rem] border border-slate-200 bg-white/80 p-6 shadow-soft dark:border-white/10 dark:bg-slate-950/45">
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Profile Snapshot</p>
+                  <div className="mt-5 space-y-4">
+                    {profileHighlights.map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-4 dark:border-white/10 dark:bg-slate-950/60"
+                      >
+                        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">{item.label}</p>
+                        <p className="mt-2 text-sm font-semibold leading-6 text-ink dark:text-white">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.75rem] border border-brand-100 bg-brand-50/80 p-6 dark:border-white/10 dark:bg-white/5">
+                  <p className="text-sm leading-7 text-slate-700 dark:text-slate-200">
+                    Yes, I made my personal website one of my main projects, and yes, I think that was a smart move.
+                  </p>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section className="grid gap-6 lg:grid-cols-2">
+            {detailSections.map((section, index) => (
+              <article
+                key={section.title}
+                className={[
+                  "glass-panel rounded-[1.9rem] p-8",
+                  index === 0 ? "lg:col-span-2" : ""
+                ].join(" ")}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ink text-white dark:bg-white dark:text-ink">
+                    {index === 0 && <Boxes className="h-5 w-5" />}
+                    {index === 1 && <BrainCircuit className="h-5 w-5" />}
+                    {index === 2 && <Sparkles className="h-5 w-5" />}
+                    {index === 3 && <BriefcaseBusiness className="h-5 w-5" />}
+                    {index === 4 && <Sparkles className="h-5 w-5" />}
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-500">{section.eyebrow}</p>
+                    <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-ink dark:text-white">
+                      {section.title}
+                    </h2>
+                    <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600 dark:text-slate-300">
+                      {section.body}
+                    </p>
+                  </div>
+                </div>
               </article>
             ))}
-          </div>
+          </section>
         </div>
       </section>
     </main>
