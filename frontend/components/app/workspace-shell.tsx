@@ -133,6 +133,9 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
   }, [usageState]);
 
   const conversationMessages = activeThread?.messages ?? [];
+  const fieldClassName =
+    "premium-input rounded-2xl px-4 py-3 text-sm disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-900/80";
+  const textareaClassName = "premium-input rounded-[1.5rem] px-4 py-4 text-sm";
 
   useEffect(() => {
     void refreshPromptLists();
@@ -369,8 +372,8 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-transparent p-4 md:p-6">
-      <div className="mx-auto grid max-w-7xl items-start gap-6 xl:grid-cols-[300px_1fr]">
+    <main className="min-h-screen bg-transparent px-4 pb-6 pt-2 md:px-6 md:pb-8 md:pt-4">
+      <div className="mx-auto grid max-w-7xl items-start gap-6 xl:grid-cols-[320px_1fr]">
         <aside className="glass-panel self-start rounded-[2rem] p-6">
           <div className="flex items-center gap-4">
             {user.avatar_url && !avatarFailed ? (
@@ -384,25 +387,26 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 className="h-14 w-14 rounded-2xl object-cover"
               />
             ) : (
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-ink text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-[0_16px_34px_rgba(31,143,85,0.24)]">
                 {user.full_name.charAt(0)}
               </div>
             )}
             <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Workspace account</p>
               <p className="truncate text-lg font-semibold text-ink dark:text-white">{user.full_name}</p>
             </div>
           </div>
 
-          <div className="mt-6 rounded-[1.5rem] bg-ink p-5 text-white">
+          <div className="premium-card mt-6 rounded-[1.5rem] p-5">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-300">Access</p>
-                <p className="mt-3 text-2xl font-semibold">{BETA_FREE_MODE ? "Public Beta" : "Workspace Access"}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Access</p>
+                <p className="mt-3 text-2xl font-semibold text-ink dark:text-white">{BETA_FREE_MODE ? "Public Beta" : "Workspace Access"}</p>
               </div>
-              <Sparkles className="h-5 w-5 text-gold" />
+              <Sparkles className="h-5 w-5 text-brand-500 dark:text-brand-100" />
             </div>
-            <p className="mt-3 text-sm text-slate-300">{usageLabel}</p>
-            <p className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-slate-200">
+            <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{usageLabel}</p>
+            <p className="premium-accent mt-4 rounded-2xl px-4 py-3 text-sm leading-6 text-brand-700 dark:text-brand-100">
               Public Beta - features currently free
             </p>
           </div>
@@ -432,8 +436,8 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                         className={cn(
                           "w-full rounded-2xl border px-4 py-3 text-left transition",
                           activeThread?.id === thread.id
-                            ? "border-brand-200 bg-brand-50 dark:border-brand-400/40 dark:bg-brand-500/10"
-                            : "border-slate-200 bg-white hover:border-brand-100 hover:bg-slate-50 dark:border-white/10 dark:bg-slate-950/45 dark:hover:bg-slate-900/70"
+                            ? "premium-accent"
+                            : "premium-card hover:-translate-y-0.5"
                         )}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -447,7 +451,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                       </button>
                     ))
                   ) : (
-                    <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400">
+                    <div className="premium-subtle rounded-2xl border-dashed px-4 py-5 text-sm text-slate-500 dark:text-slate-400">
                       Your recent AI threads will appear here.
                     </div>
                   )}
@@ -458,7 +462,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <button
                   type="button"
                   onClick={() => setHistoryOpen((current) => !current)}
-                  className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-slate-700 transition hover:border-brand-100 hover:text-ink dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-900/70 dark:hover:text-white"
+                  className="premium-card flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:text-ink dark:text-slate-200 dark:hover:text-white"
                 >
                   <span className="inline-flex items-center gap-2">
                     <Clock3 className="h-4 w-4" />
@@ -467,7 +471,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                   <ChevronDown className={cn("h-4 w-4 transition", historyOpen && "rotate-180")} />
                 </button>
                 {historyOpen && (
-                  <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">
+                  <div className="premium-scroll mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">
                     {historyThreads.length > 0 ? (
                       historyThreads.map((thread) => (
                         <button
@@ -477,8 +481,8 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                           className={cn(
                             "w-full rounded-2xl border px-4 py-3 text-left transition",
                             activeThread?.id === thread.id
-                              ? "border-brand-200 bg-brand-50 dark:border-brand-400/40 dark:bg-brand-500/10"
-                              : "border-slate-200 bg-white hover:border-brand-100 hover:bg-slate-50 dark:border-white/10 dark:bg-slate-950/45 dark:hover:bg-slate-900/70"
+                              ? "premium-accent"
+                              : "premium-card hover:-translate-y-0.5"
                           )}
                         >
                           <p className="truncate text-sm font-semibold text-ink dark:text-white">{thread.title}</p>
@@ -490,7 +494,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                         </button>
                       ))
                     ) : (
-                      <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400">
+                      <div className="premium-subtle rounded-2xl border-dashed px-4 py-5 text-sm text-slate-500 dark:text-slate-400">
                         No conversations from the last 14 days yet.
                       </div>
                     )}
@@ -512,15 +516,15 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-100 hover:text-ink dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-200 dark:hover:border-brand-100 dark:hover:text-white">
+                <Link href="/" className="premium-card inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:text-ink dark:text-slate-200 dark:hover:text-white">
                   <Home className="h-4 w-4" />
                   Home
                 </Link>
-                <button type="button" onClick={() => setSettingsOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-100 hover:text-ink dark:border-white/10 dark:bg-slate-950/50 dark:text-slate-200 dark:hover:border-brand-100 dark:hover:text-white">
+                <button type="button" onClick={() => setSettingsOpen(true)} className="premium-card inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:text-ink dark:text-slate-200 dark:hover:text-white">
                   <Settings2 className="h-4 w-4" />
                   Settings
                 </button>
-                <div className="rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-600 dark:border-white/10 dark:bg-white/5 dark:text-brand-100">
+                <div className="premium-accent rounded-full px-4 py-2 text-sm font-semibold text-brand-700 dark:text-brand-100">
                   Public Beta - features currently free
                 </div>
               </div>
@@ -543,13 +547,13 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                     New conversation
                   </Button>
                   {activeThread && (
-                    <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-300">
+                    <div className="premium-subtle rounded-full px-4 py-2 text-sm text-slate-600 dark:text-slate-300">
                       {activeThread.subject} - {activeThread.title}
                     </div>
                   )}
                 </div>
                 <select
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-brand-500 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:disabled:bg-slate-900/80"
+                  className={fieldClassName}
                   value={promptForm.subject}
                   disabled={Boolean(activeThread)}
                   onChange={(event) => setPromptForm((current) => ({ ...current, subject: event.target.value }))}
@@ -561,7 +565,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                   ))}
                 </select>
                 <textarea
-                  className="min-h-56 w-full rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 text-sm outline-none transition focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500"
+                  className={`${textareaClassName} min-h-56`}
                   placeholder={
                     activeThread
                       ? "Ask a follow-up question, refine the prior explanation, or continue the same problem."
@@ -584,16 +588,16 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                   <p className="text-sm text-slate-500 dark:text-slate-300">Turn rough notes into a stronger draft while keeping the structure familiar and submission-ready.</p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Lab title" value={labForm.lab_title} onChange={(event) => setLabForm((current) => ({ ...current, lab_title: event.target.value }))} />
-                  <select className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" value={labForm.subject} onChange={(event) => setLabForm((current) => ({ ...current, subject: event.target.value }))}>
+                  <input className={fieldClassName} placeholder="Lab title" value={labForm.lab_title} onChange={(event) => setLabForm((current) => ({ ...current, lab_title: event.target.value }))} />
+                  <select className={fieldClassName} value={labForm.subject} onChange={(event) => setLabForm((current) => ({ ...current, subject: event.target.value }))}>
                     {subjectOptions.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
                   </select>
                 </div>
-                <textarea className="min-h-28 rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Describe the lab and its objective." value={labForm.description} onChange={(event) => setLabForm((current) => ({ ...current, description: event.target.value }))} />
-                <textarea className="min-h-24 rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Methods / procedure" value={labForm.methods} onChange={(event) => setLabForm((current) => ({ ...current, methods: event.target.value }))} />
-                <textarea className="min-h-24 rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Observations" value={labForm.observations} onChange={(event) => setLabForm((current) => ({ ...current, observations: event.target.value }))} />
-                <textarea className="min-h-24 rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Results / data summary" value={labForm.results} onChange={(event) => setLabForm((current) => ({ ...current, results: event.target.value }))} />
-                <textarea className="min-h-24 rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Additional notes or sources of error" value={labForm.notes} onChange={(event) => setLabForm((current) => ({ ...current, notes: event.target.value }))} />
+                <textarea className={`${textareaClassName} min-h-28`} placeholder="Describe the lab and its objective." value={labForm.description} onChange={(event) => setLabForm((current) => ({ ...current, description: event.target.value }))} />
+                <textarea className={`${textareaClassName} min-h-24`} placeholder="Methods / procedure" value={labForm.methods} onChange={(event) => setLabForm((current) => ({ ...current, methods: event.target.value }))} />
+                <textarea className={`${textareaClassName} min-h-24`} placeholder="Observations" value={labForm.observations} onChange={(event) => setLabForm((current) => ({ ...current, observations: event.target.value }))} />
+                <textarea className={`${textareaClassName} min-h-24`} placeholder="Results / data summary" value={labForm.results} onChange={(event) => setLabForm((current) => ({ ...current, results: event.target.value }))} />
+                <textarea className={`${textareaClassName} min-h-24`} placeholder="Additional notes or sources of error" value={labForm.notes} onChange={(event) => setLabForm((current) => ({ ...current, notes: event.target.value }))} />
                 <UploadPanel purpose="lab_helper" files={labFiles} loading={loadingUpload} onUpload={handleUpload} onRemove={(fileId) => removeFile(fileId, "lab_helper")} />
                 <Button className="w-full md:w-auto" onClick={handleLabSubmit} disabled={loadingAction}>{loadingAction ? "Drafting report..." : "Generate lab report"}</Button>
               </div>
@@ -606,24 +610,24 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                   <p className="text-sm text-slate-500 dark:text-slate-300">Generate equations or chart measured data without leaving the workspace.</p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Graph title" value={graphForm.title} onChange={(event) => setGraphForm((current) => ({ ...current, title: event.target.value }))} />
-                  <select className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" value={graphForm.graph_type} onChange={(event) => setGraphForm((current) => ({ ...current, graph_type: event.target.value }))}>
+                  <input className={fieldClassName} placeholder="Graph title" value={graphForm.title} onChange={(event) => setGraphForm((current) => ({ ...current, title: event.target.value }))} />
+                  <select className={fieldClassName} value={graphForm.graph_type} onChange={(event) => setGraphForm((current) => ({ ...current, graph_type: event.target.value }))}>
                     <option value="line">Line graph</option><option value="scatter">Scatter plot</option>
                   </select>
                 </div>
-                <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Equation, e.g. sin(x) or x^2 + 3*x" value={graphForm.equation} onChange={(event) => setGraphForm((current) => ({ ...current, equation: event.target.value }))} />
+                <input className={fieldClassName} placeholder="Equation, e.g. sin(x) or x^2 + 3*x" value={graphForm.equation} onChange={(event) => setGraphForm((current) => ({ ...current, equation: event.target.value }))} />
                 <div className="grid gap-4 md:grid-cols-3">
-                  <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="X label" value={graphForm.x_label} onChange={(event) => setGraphForm((current) => ({ ...current, x_label: event.target.value }))} />
-                  <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Y label" value={graphForm.y_label} onChange={(event) => setGraphForm((current) => ({ ...current, y_label: event.target.value }))} />
-                  <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Series label" value={graphForm.label} onChange={(event) => setGraphForm((current) => ({ ...current, label: event.target.value }))} />
+                  <input className={fieldClassName} placeholder="X label" value={graphForm.x_label} onChange={(event) => setGraphForm((current) => ({ ...current, x_label: event.target.value }))} />
+                  <input className={fieldClassName} placeholder="Y label" value={graphForm.y_label} onChange={(event) => setGraphForm((current) => ({ ...current, y_label: event.target.value }))} />
+                  <input className={fieldClassName} placeholder="Series label" value={graphForm.label} onChange={(event) => setGraphForm((current) => ({ ...current, label: event.target.value }))} />
                 </div>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <input type="number" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" placeholder="x min" value={graphForm.x_min} onChange={(event) => setGraphForm((current) => ({ ...current, x_min: Number(event.target.value) }))} />
-                  <input type="number" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" placeholder="x max" value={graphForm.x_max} onChange={(event) => setGraphForm((current) => ({ ...current, x_max: Number(event.target.value) }))} />
-                  <input type="number" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white" placeholder="samples" value={graphForm.sample_count} onChange={(event) => setGraphForm((current) => ({ ...current, sample_count: Number(event.target.value) }))} />
+                  <input type="number" className={fieldClassName} placeholder="x min" value={graphForm.x_min} onChange={(event) => setGraphForm((current) => ({ ...current, x_min: Number(event.target.value) }))} />
+                  <input type="number" className={fieldClassName} placeholder="x max" value={graphForm.x_max} onChange={(event) => setGraphForm((current) => ({ ...current, x_max: Number(event.target.value) }))} />
+                  <input type="number" className={fieldClassName} placeholder="samples" value={graphForm.sample_count} onChange={(event) => setGraphForm((current) => ({ ...current, sample_count: Number(event.target.value) }))} />
                 </div>
-                <textarea className="min-h-24 rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Optional X data, comma separated" value={graphForm.rawX} onChange={(event) => setGraphForm((current) => ({ ...current, rawX: event.target.value }))} />
-                <textarea className="min-h-24 rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 text-sm outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-950/50 dark:text-white dark:placeholder:text-slate-500" placeholder="Optional Y data, comma separated" value={graphForm.rawY} onChange={(event) => setGraphForm((current) => ({ ...current, rawY: event.target.value }))} />
+                <textarea className={`${textareaClassName} min-h-24`} placeholder="Optional X data, comma separated" value={graphForm.rawX} onChange={(event) => setGraphForm((current) => ({ ...current, rawX: event.target.value }))} />
+                <textarea className={`${textareaClassName} min-h-24`} placeholder="Optional Y data, comma separated" value={graphForm.rawY} onChange={(event) => setGraphForm((current) => ({ ...current, rawY: event.target.value }))} />
                 <Button className="w-full md:w-auto" onClick={handleGraphSubmit} disabled={loadingAction}>{loadingAction ? "Rendering graph..." : "Generate graph"}</Button>
               </div>
             )}
@@ -644,11 +648,11 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <span>{usageLabel}</span>
               </div>
             </div>
-            <div className={cn("mt-5 rounded-[1.5rem] bg-white p-5 dark:bg-slate-950/55", activeTab === "ai_prompt" || response || graphUrl ? "min-h-0" : "min-h-[28rem]")}>
+            <div className={cn("premium-card mt-5 rounded-[1.5rem] p-5", activeTab === "ai_prompt" || response || graphUrl ? "min-h-0" : "min-h-[28rem]")}>
               {activeTab === "ai_prompt" ? (
                 <div
                   ref={conversationScrollRef}
-                  className="h-[28rem] min-h-[20rem] max-h-[75vh] resize-y overflow-y-auto rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 pr-3 dark:border-white/10 dark:bg-slate-950/35"
+                  className="premium-scroll premium-subtle h-[28rem] min-h-[20rem] max-h-[75vh] resize-y overflow-y-auto rounded-[1.5rem] p-4 pr-3"
                 >
                   {conversationMessages.length > 0 ? (
                     <div className="space-y-4">
@@ -658,8 +662,8 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                           className={cn(
                             "rounded-[1.5rem] border px-4 py-4",
                             message.role === "assistant"
-                              ? "border-slate-200 bg-white dark:border-white/10 dark:bg-slate-950/75"
-                              : "border-brand-100 bg-brand-50 dark:border-brand-400/30 dark:bg-brand-500/10"
+                              ? "premium-card"
+                              : "premium-accent"
                           )}
                         >
                           <div className="mb-3 flex items-center justify-between gap-3">
@@ -677,7 +681,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <div className="flex h-full min-h-[18rem] items-center justify-center rounded-[1.5rem] border border-dashed border-slate-200 bg-white/70 px-6 text-center text-slate-500 dark:border-white/10 dark:bg-slate-950/30 dark:text-slate-400">
+                    <div className="premium-subtle flex h-full min-h-[18rem] items-center justify-center rounded-[1.5rem] border-dashed px-6 text-center text-slate-500 dark:text-slate-400">
                       {loadingThread
                         ? "Loading conversation..."
                         : "Start a new AI conversation or open one from the sidebar to continue where you left off."}
@@ -688,11 +692,13 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <ResponseRenderer content={response} />
               ) : graphUrl ? (
                 <div className="space-y-4">
-                  <img src={graphUrl} alt="Generated graph" className="w-full rounded-3xl border border-slate-100 dark:border-white/10" />
-                  <a href={graphUrl} download className="inline-flex rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white">Download graph</a>
+                  <img src={graphUrl} alt="Generated graph" className="w-full rounded-3xl border border-slate-100 shadow-soft dark:border-white/10" />
+                  <a href={graphUrl} download className="inline-flex rounded-full bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_34px_rgba(31,143,85,0.24)]">
+                    Download graph
+                  </a>
                 </div>
               ) : (
-                <div className="flex h-full min-h-[24rem] items-center justify-center rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 px-6 text-center text-slate-500 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-400">
+                <div className="premium-subtle flex h-full min-h-[24rem] items-center justify-center rounded-[1.5rem] border-dashed px-6 text-center text-slate-500 dark:text-slate-400">
                   Generated explanations, lab reports, and graphs will appear here after you submit a request.
                 </div>
               )}
@@ -703,7 +709,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Recent uploads</p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   {dashboard.uploaded_files.map((file) => (
-                    <a key={file.id} href={file.url} target="_blank" rel="noreferrer" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200">
+                    <a key={file.id} href={file.url} target="_blank" rel="noreferrer" className="premium-card rounded-full px-4 py-2 text-sm text-slate-600 transition hover:-translate-y-0.5 dark:text-slate-200">
                       {file.original_name}
                     </a>
                   ))}
@@ -736,7 +742,9 @@ function SidebarButton({
       onClick={onClick}
       className={cn(
         "flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left text-sm font-semibold transition",
-        active ? "bg-ink text-white shadow-soft" : "bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-950/45 dark:text-slate-200 dark:hover:bg-slate-900/80"
+        active
+          ? "border border-brand-500/20 bg-brand-500 text-white shadow-[0_18px_36px_rgba(31,143,85,0.24)] dark:text-slate-950"
+          : "premium-card text-slate-700 hover:-translate-y-0.5 hover:text-ink dark:text-slate-200 dark:hover:text-white"
       )}
     >
       <Icon className="h-5 w-5" />

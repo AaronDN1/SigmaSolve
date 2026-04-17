@@ -15,9 +15,9 @@ type Props = {
 
 export function UploadPanel({ purpose, files, loading, onUpload, onRemove }: Props) {
   return (
-    <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50/80 p-5 dark:border-white/10 dark:bg-slate-950/35">
+    <div className="premium-subtle rounded-[1.5rem] border-dashed p-5">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-brand-500 shadow-sm dark:bg-slate-900 dark:text-brand-100">
+        <div className="premium-card flex h-10 w-10 items-center justify-center rounded-2xl text-brand-500 dark:text-brand-100">
           <UploadCloud className="h-5 w-5" />
         </div>
         <div>
@@ -26,7 +26,7 @@ export function UploadPanel({ purpose, files, loading, onUpload, onRemove }: Pro
         </div>
       </div>
 
-      <label className="mt-4 flex cursor-pointer items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-medium text-slate-700 transition hover:border-brand-100 hover:text-brand-600 dark:border-white/10 dark:bg-slate-950/45 dark:text-slate-200">
+      <label className="premium-card mt-4 flex cursor-pointer items-center justify-center rounded-2xl px-4 py-4 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:text-brand-600 dark:text-slate-200">
         <input
           type="file"
           className="hidden"
@@ -45,7 +45,7 @@ export function UploadPanel({ purpose, files, loading, onUpload, onRemove }: Pro
       {files.length > 0 && (
         <div className="mt-4 space-y-3">
           {files.map((file) => (
-            <div key={file.id} className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-sm dark:bg-slate-950/50">
+            <div key={file.id} className="premium-card flex items-center justify-between rounded-2xl px-4 py-3">
               <div>
                 <p className="text-sm font-semibold text-ink dark:text-white">{file.original_name}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">{file.mime_type}</p>

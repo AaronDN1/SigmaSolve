@@ -6,13 +6,14 @@ export default function SignInPage() {
   return (
     <main className="min-h-screen px-6 py-10 lg:px-8">
       <div className="mx-auto grid min-h-[85vh] max-w-6xl items-center gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-        <section className="rounded-[2rem] bg-ink bg-hero-glow p-10 text-white shadow-soft">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-300">Sigma Solve</p>
-          <h1 className="mt-6 font-serif text-5xl leading-tight">A polished STEM workspace now running in public beta.</h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-300">
+        <section className="glass-panel overflow-hidden rounded-[2rem] p-10">
+          <div className="absolute inset-0 -z-10 bg-hero-glow opacity-70" />
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-500">Sigma Solve</p>
+          <h1 className="mt-6 font-serif text-5xl leading-tight text-ink dark:text-white">A polished STEM workspace now running in public beta.</h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300">
             Sign in with Google to open the app, track your plan, save uploads, and use AI Prompt, Lab Helper, and Graphing in one place.
           </p>
-          <div className="mt-10 space-y-4 text-sm text-slate-300">
+          <div className="mt-10 space-y-4 text-sm text-slate-600 dark:text-slate-300">
             <p>Public Beta - 20 prompts per day.</p>
             <p>All signed-in users can access the full product experience while public testing is active.</p>
           </div>

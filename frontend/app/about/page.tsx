@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowRight, BrainCircuit, BriefcaseBusiness, Boxes, Sparkles } from "lucide-react";
 
 import { MarketingNav } from "@/components/landing/marketing-nav";
@@ -67,7 +70,12 @@ export default function AboutPage() {
       <MarketingNav />
       <section className="px-6 pb-24 pt-14 lg:px-8 lg:pt-20">
         <div className="mx-auto max-w-6xl space-y-8">
-          <section className="glass-panel overflow-hidden rounded-[2.25rem] p-8 md:p-10">
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="glass-panel overflow-hidden rounded-[2.25rem] p-8 md:p-10"
+          >
             <div className="grid gap-8 lg:grid-cols-[1.35fr_0.65fr] lg:items-start">
               <div>
                 <h1 className="max-w-4xl font-serif text-5xl leading-tight text-ink dark:text-white md:text-6xl">
@@ -84,7 +92,7 @@ export default function AboutPage() {
                   {focusAreas.map((item) => (
                     <span
                       key={item}
-                      className="rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-slate-950/40 dark:text-slate-200"
+                      className="premium-card rounded-full px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200"
                     >
                       {item}
                     </span>
@@ -110,13 +118,13 @@ export default function AboutPage() {
               </div>
 
               <aside className="space-y-4">
-                <div className="rounded-[1.75rem] border border-slate-200 bg-white/80 p-6 shadow-soft dark:border-white/10 dark:bg-slate-950/45">
+                <div className="premium-card rounded-[1.75rem] p-6">
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Profile Snapshot</p>
                   <div className="mt-5 space-y-4">
                     {profileHighlights.map((item) => (
                       <div
                         key={item.label}
-                        className="rounded-2xl border border-slate-200/80 bg-slate-50 px-4 py-4 dark:border-white/10 dark:bg-slate-950/60"
+                        className="premium-subtle rounded-2xl px-4 py-4"
                       >
                         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">{item.label}</p>
                         <p className="mt-2 text-sm font-semibold leading-6 text-ink dark:text-white">{item.value}</p>
@@ -125,26 +133,30 @@ export default function AboutPage() {
                   </div>
                 </div>
 
-                <div className="rounded-[1.75rem] border border-brand-100 bg-brand-50/80 p-6 dark:border-white/10 dark:bg-white/5">
+                <div className="premium-accent rounded-[1.75rem] p-6">
                   <p className="text-sm leading-7 text-slate-700 dark:text-slate-200">
                     Yes, I made my personal website one of my main projects, and yes, I think that was a smart move.
                   </p>
                 </div>
               </aside>
             </div>
-          </section>
+          </motion.section>
 
           <section className="grid gap-6 lg:grid-cols-2">
             {detailSections.map((section, index) => (
-              <article
+              <motion.article
                 key={section.title}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4, delay: index * 0.04, ease: [0.22, 1, 0.36, 1] }}
                 className={[
                   "glass-panel rounded-[1.9rem] p-8",
                   index === 0 ? "lg:col-span-2" : ""
                 ].join(" ")}
               >
                 <div className="flex items-start gap-4">
-                  <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-ink text-white dark:bg-white dark:text-ink">
+                  <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-[0_14px_28px_rgba(31,143,85,0.22)] dark:bg-brand-400 dark:text-slate-950">
                     {index === 0 && <Boxes className="h-5 w-5" />}
                     {index === 1 && <BrainCircuit className="h-5 w-5" />}
                     {index === 2 && <Sparkles className="h-5 w-5" />}
@@ -161,7 +173,7 @@ export default function AboutPage() {
                     </p>
                   </div>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </section>
         </div>

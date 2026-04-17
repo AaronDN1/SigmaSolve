@@ -15,22 +15,22 @@ export function Pricing() {
         />
 
         <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-[2rem] bg-ink p-8 text-white shadow-soft">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-slate-200">
+          <div className="glass-panel rounded-[2rem] p-8 text-white">
+            <div className="inline-flex items-center gap-2 rounded-full border border-brand-400/20 bg-brand-500/15 px-4 py-2 text-sm text-slate-200">
               <Sparkles className="h-4 w-4 text-gold" />
               Beta access
             </div>
-            <h3 className="mt-6 font-serif text-4xl leading-tight">All core tools are unlocked while we test in public.</h3>
-            <p className="mt-6 text-lg leading-8 text-slate-300">
+            <h3 className="mt-6 font-serif text-4xl leading-tight text-ink dark:text-white">All core tools are unlocked while we test in public.</h3>
+            <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300">
               Sign in, use the product normally, and help us validate the experience before billing goes live.
             </p>
             <p className="mt-5 text-sm uppercase tracking-[0.3em] text-slate-400">Public Beta - 20 prompts per day</p>
           </div>
 
-          <article className="rounded-[2rem] border border-brand-100 bg-gradient-to-b from-brand-50 to-white p-8 shadow-soft">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-600">What beta includes</p>
-            <h3 className="mt-4 text-4xl font-semibold text-ink">Full product access</h3>
-            <p className="mt-3 text-slate-600">Public Beta - 20 prompts per day. No checkout flow is shown while testing is active.</p>
+          <article className="premium-card rounded-[2rem] p-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-200">What beta includes</p>
+            <h3 className="mt-4 text-4xl font-semibold text-ink dark:text-white">Full product access</h3>
+            <p className="mt-3 text-slate-600 dark:text-slate-300">Public Beta - 20 prompts per day. No checkout flow is shown while testing is active.</p>
             <ul className="mt-8 space-y-4 text-sm text-slate-700">
               {[
                 "AI Prompt access",
@@ -40,7 +40,7 @@ export function Pricing() {
                 "Google sign-in and saved workspace history",
                 "Stripe billing kept inactive until launch"
               ].map((item) => (
-                <li key={item} className="flex items-center gap-3 border-b border-slate-200/60 pb-4">
+                <li key={item} className="flex items-center gap-3 border-b border-slate-200/60 pb-4 text-slate-700 dark:border-white/10 dark:text-slate-200">
                   <Check className="h-4 w-4 text-accent" />
                   <span>{item}</span>
                 </li>

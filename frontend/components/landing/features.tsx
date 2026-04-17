@@ -1,4 +1,7 @@
+"use client";
+
 import { BrainCircuit, ChartSpline, FileChartColumnIncreasing, ShieldCheck, Sparkles, UploadCloud } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { SectionHeading } from "@/components/shared/section-heading";
 
@@ -46,14 +49,22 @@ export function Features() {
         />
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {features.map(({ icon: Icon, title, body }) => (
-            <article key={title} className="glass-panel rounded-[1.75rem] p-7">
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-500 dark:bg-white/10 dark:text-brand-100">
+          {features.map(({ icon: Icon, title, body }, index) => (
+            <motion.article
+              key={title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.4, delay: index * 0.04, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -5 }}
+              className="glass-panel rounded-[1.85rem] p-7"
+            >
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] dark:bg-brand-500/12 dark:text-brand-100">
                 <Icon className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold text-ink dark:text-white">{title}</h3>
               <p className="mt-4 text-base leading-8 text-slate-600 dark:text-slate-300">{body}</p>
-            </article>
+            </motion.article>
           ))}
         </div>
       </div>
