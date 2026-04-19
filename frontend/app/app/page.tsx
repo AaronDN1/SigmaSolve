@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { WorkspaceShell } from "@/components/app/workspace-shell";
 import { endAnalyticsSession, setAnalyticsUser, startAnalyticsSession } from "@/lib/analytics";
+import { setCookieConsent } from "@/lib/cookie-consent";
 import { getDashboard, getSession, getUsageStatus } from "@/lib/api";
 import type { DashboardData, UsageStatus, User } from "@/types";
 
@@ -24,6 +25,7 @@ export default function WorkspacePage() {
           router.replace("/signin");
           return;
         }
+        setCookieConsent("account");
         setAnalyticsUser(session.user.id);
         startAnalyticsSession(session.user.id);
         setUser(session.user);

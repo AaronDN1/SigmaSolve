@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { LegalDocumentModal } from "@/components/shared/legal-document-modal";
 import { signInWithGoogle } from "@/lib/api";
+import { setCookieConsent } from "@/lib/cookie-consent";
 import type { LegalDocumentKey } from "@/lib/legal-documents";
 
 declare global {
@@ -49,6 +50,7 @@ export function GoogleSignIn() {
             accepted_terms: acceptedLegal,
             accepted_privacy: acceptedLegal
           });
+          setCookieConsent("account");
           router.push("/app");
           router.refresh();
         } catch (err) {

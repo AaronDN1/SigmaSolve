@@ -1,4 +1,5 @@
 import { Cta } from "@/components/landing/cta";
+import { CookieConsentBanner } from "@/components/landing/cookie-consent-banner";
 import { Features } from "@/components/landing/features";
 import { Hero } from "@/components/landing/hero";
 import { LandingIntro } from "@/components/landing/landing-intro";
@@ -15,6 +16,7 @@ export default function HomePage() {
       <Features />
       <HowItWorks />
       <Cta />
+      <CookieConsentBanner />
       <SiteFootnote />
     </main>
   );
