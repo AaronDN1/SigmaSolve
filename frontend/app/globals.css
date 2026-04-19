@@ -34,28 +34,29 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --page-bg:
-    radial-gradient(circle at top left, rgba(31, 143, 85, 0.2), transparent 26%),
-    radial-gradient(circle at 82% 10%, rgba(92, 130, 110, 0.26), transparent 18%),
-    linear-gradient(180deg, #08120c 0%, #0d1711 52%, #111c15 100%);
-  --text-color: #f8fafc;
-  --panel-bg: rgba(10, 20, 14, 0.72);
-  --panel-strong: rgba(16, 29, 20, 0.9);
-  --panel-subtle: rgba(16, 25, 19, 0.68);
-  --panel-border: rgba(195, 211, 203, 0.1);
-  --border-soft: rgba(195, 211, 203, 0.14);
-  --border-strong: rgba(195, 211, 203, 0.24);
-  --panel-shadow: 0 26px 80px rgba(1, 6, 3, 0.45);
-  --panel-shadow-strong: 0 30px 110px rgba(1, 6, 3, 0.56);
-  --accent: #6dc08c;
-  --accent-strong: #83d39e;
-  --link-color: #83d39e;
-  --link-hover: #a1dfb7;
-  --accent-soft: rgba(109, 192, 140, 0.12);
-  --muted-text: #9db1a5;
-  --markdown-heading: #f8fafc;
-  --markdown-body: #d6e3db;
-  --inline-code-bg: rgba(109, 192, 140, 0.16);
-  --inline-code-text: #bfe8cc;
+    radial-gradient(circle at top left, rgba(74, 145, 101, 0.18), transparent 28%),
+    radial-gradient(circle at 82% 10%, rgba(118, 151, 130, 0.2), transparent 20%),
+    linear-gradient(180deg, #101813 0%, #15201a 52%, #1a241e 100%);
+  --text-color: #edf3ef;
+  --panel-bg: rgba(25, 37, 31, 0.72);
+  --panel-strong: rgba(30, 43, 36, 0.9);
+  --panel-subtle: rgba(26, 38, 32, 0.72);
+  --panel-border: rgba(214, 225, 218, 0.08);
+  --border-soft: rgba(214, 225, 218, 0.12);
+  --border-strong: rgba(214, 225, 218, 0.19);
+  --panel-shadow: 0 22px 68px rgba(7, 12, 9, 0.34);
+  --panel-shadow-strong: 0 28px 96px rgba(7, 12, 9, 0.42);
+  --accent: #67b383;
+  --accent-strong: #78c193;
+  --link-color: #8ccda5;
+  --link-hover: #a6d8b8;
+  --accent-soft: rgba(103, 179, 131, 0.11);
+  --muted-text: #acc0b3;
+  --markdown-heading: #edf3ef;
+  --markdown-body: #d5e0d9;
+  --inline-code-bg: rgba(103, 179, 131, 0.13);
+  --inline-code-text: #c9ead4;
+  --code-block-bg: rgba(18, 28, 23, 0.92);
 }
 
 html {
@@ -85,7 +86,7 @@ body::before {
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 96px 96px;
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 80%);
-  opacity: 0.25;
+  opacity: 0.18;
 }
 
 h1,
@@ -109,7 +110,7 @@ a {
   position: relative;
   border: 1px solid var(--panel-border);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 100%),
     var(--panel-bg);
   box-shadow: var(--panel-shadow);
   backdrop-filter: blur(24px);
@@ -236,7 +237,7 @@ a {
 .markdown-content pre {
   overflow-x: auto;
   border-radius: 1rem;
-  background: rgba(15, 23, 42, 0.95);
+  background: var(--code-block-bg, rgba(15, 23, 42, 0.95));
   padding: 1rem;
 }
 

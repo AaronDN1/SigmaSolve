@@ -5,13 +5,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BrainCircuit,
   ChartSpline,
+  Check,
   ChevronDown,
   Clock3,
   FlaskConical,
   Home,
   MessageSquarePlus,
+  MessageSquareText,
   Settings2,
-  Sparkles
+  Sparkles,
+  Trash2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -35,6 +38,7 @@ import { cn } from "@/lib/utils";
 import {
   continuePromptThread,
   createPromptThread,
+  deletePromptThread,
   generateGraph,
   getPromptThread,
   getPromptThreadHistory,
@@ -51,6 +55,7 @@ import type {
   UsageStatus,
   User
 } from "@/types";
+import type { ComponentType, SelectHTMLAttributes } from "react";
 
 type WorkspaceTab = "ai_prompt" | "lab_helper" | "graphing";
 
@@ -72,6 +77,11 @@ const subjectOptions = [
 ];
 
 const BETA_FREE_MODE = process.env.NEXT_PUBLIC_BETA_FREE_MODE === "true";
+const fieldClassName =
+  "premium-input rounded-2xl px-4 py-3 text-sm disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-900/80";
+const textareaClassName = "premium-input rounded-[1.5rem] px-4 py-4 text-sm";
+const selectClassName =
+  "premium-input w-full appearance-none rounded-2xl px-4 py-3 pr-12 text-sm font-medium disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-900/80";
 
 function formatThreadTime(value: string) {
   return new Intl.DateTimeFormat(undefined, {
@@ -85,6 +95,7 @@ function formatThreadTime(value: string) {
 export function WorkspaceShell({ user, usage, dashboard }: Props) {
   const router = useRouter();
   const conversationScrollRef = useRef<HTMLDivElement | null>(null);
+  const previousMessageCountRef = useRef(0);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("ai_prompt");
   const [response, setResponse] = useState<string>("");
   const [graphUrl, setGraphUrl] = useState<string>("");
@@ -101,6 +112,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
   const [historyThreads, setHistoryThreads] = useState<PromptConversationSummary[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [loadingThread, setLoadingThread] = useState(false);
+  const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null);
 
   const [promptForm, setPromptForm] = useState({ subject: "Math", prompt: "" });
   const [labForm, setLabForm] = useState({
@@ -133,9 +145,6 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
   }, [usageState]);
 
   const conversationMessages = activeThread?.messages ?? [];
-  const fieldClassName =
-    "premium-input rounded-2xl px-4 py-3 text-sm disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-900/80";
-  const textareaClassName = "premium-input rounded-[1.5rem] px-4 py-4 text-sm";
 
   useEffect(() => {
     void refreshPromptLists();
@@ -147,10 +156,20 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
   }, [activeThread]);
 
   useEffect(() => {
+    previousMessageCountRef.current = conversationMessages.length;
+  }, [activeThread?.id]);
+
+  useEffect(() => {
     if (activeTab !== "ai_prompt" || !conversationScrollRef.current) return;
     const container = conversationScrollRef.current;
-    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-  }, [activeTab, conversationMessages.length, loadingAction, activeThread?.id]);
+    const behavior =
+      conversationMessages.length > previousMessageCountRef.current && previousMessageCountRef.current > 0
+        ? "smooth"
+        : "auto";
+
+    container.scrollTo({ top: container.scrollHeight, behavior });
+    previousMessageCountRef.current = conversationMessages.length;
+  }, [activeTab, conversationMessages.length, activeThread?.id]);
 
   useEffect(() => {
     openFeature(activeTab);
@@ -232,6 +251,27 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
     setPromptFiles([]);
     setPromptForm((current) => ({ ...current, prompt: "" }));
     setHistoryOpen(false);
+  }
+
+  async function handleDeleteThread(thread: PromptConversationSummary) {
+    const confirmed = window.confirm(`Delete "${thread.title}"? This conversation will be removed from your history.`);
+    if (!confirmed) return;
+
+    setDeletingThreadId(thread.id);
+    setError("");
+    try {
+      await deletePromptThread(thread.id);
+      setRecentThreads((current) => current.filter((entry) => entry.id !== thread.id));
+      setHistoryThreads((current) => current.filter((entry) => entry.id !== thread.id));
+      if (activeThread?.id === thread.id) {
+        startNewConversation();
+      }
+      await refreshPromptLists();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to delete conversation.");
+    } finally {
+      setDeletingThreadId(null);
+    }
   }
 
   async function handlePromptSubmit() {
@@ -403,7 +443,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Access</p>
                 <p className="mt-3 text-2xl font-semibold text-ink dark:text-white">{BETA_FREE_MODE ? "Public Beta" : "Workspace Access"}</p>
               </div>
-              <Sparkles className="h-5 w-5 text-brand-500 dark:text-brand-100" />
+              <Sparkles className="h-5 w-5 text-brand-500 dark:text-brand-200" />
             </div>
             <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{usageLabel}</p>
             <p className="premium-accent mt-4 rounded-2xl px-4 py-3 text-sm leading-6 text-brand-700 dark:text-brand-100">
@@ -429,26 +469,39 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <div className="mt-3 space-y-2">
                   {recentThreads.length > 0 ? (
                     recentThreads.map((thread) => (
-                      <button
+                      <div
                         key={thread.id}
-                        type="button"
-                        onClick={() => void loadThread(thread.id)}
                         className={cn(
-                          "w-full rounded-2xl border px-4 py-3 text-left transition",
+                          "relative rounded-[1.1rem] border px-3 py-2.5 transition",
                           activeThread?.id === thread.id
                             ? "premium-accent"
-                            : "premium-card hover:-translate-y-0.5"
+                            : "premium-card hover:border-[var(--border-strong)]"
                         )}
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-ink dark:text-white">{thread.title}</p>
-                            <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-slate-400">{thread.subject}</p>
-                          </div>
-                          <span className="shrink-0 text-[11px] text-slate-400">{formatThreadTime(thread.updated_at)}</span>
+                        <button
+                          type="button"
+                          aria-label={`Delete ${thread.title}`}
+                          disabled={deletingThreadId === thread.id}
+                          onClick={() => void handleDeleteThread(thread)}
+                          className="absolute right-2.5 top-2.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-rose-500/10 dark:hover:text-rose-200"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                        <div className="pr-8">
+                          <button
+                            type="button"
+                            onClick={() => void loadThread(thread.id)}
+                            className="min-w-0 w-full text-left"
+                          >
+                            <p className="truncate text-[13px] font-semibold leading-5 text-ink dark:text-white">{thread.title}</p>
+                            <div className="mt-0.5 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-400">
+                              <p className="min-w-0 truncate">{thread.subject}</p>
+                              <span className="whitespace-nowrap normal-case tracking-normal">{formatThreadTime(thread.updated_at)}</span>
+                            </div>
+                            <p className="mt-1.5 text-[13px] leading-5 text-slate-500 dark:text-slate-300">{thread.latest_message_preview}</p>
+                          </button>
                         </div>
-                        <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-300">{thread.latest_message_preview}</p>
-                      </button>
+                      </div>
                     ))
                   ) : (
                     <div className="premium-subtle rounded-2xl border-dashed px-4 py-5 text-sm text-slate-500 dark:text-slate-400">
@@ -474,24 +527,39 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                   <div className="premium-scroll mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">
                     {historyThreads.length > 0 ? (
                       historyThreads.map((thread) => (
-                        <button
+                        <div
                           key={thread.id}
-                          type="button"
-                          onClick={() => void loadThread(thread.id)}
                           className={cn(
-                            "w-full rounded-2xl border px-4 py-3 text-left transition",
+                            "relative rounded-[1.1rem] border px-3 py-2.5 transition",
                             activeThread?.id === thread.id
                               ? "premium-accent"
-                              : "premium-card hover:-translate-y-0.5"
+                              : "premium-card hover:border-[var(--border-strong)]"
                           )}
                         >
-                          <p className="truncate text-sm font-semibold text-ink dark:text-white">{thread.title}</p>
-                          <div className="mt-1 flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.2em] text-slate-400">
-                            <span className="truncate">{thread.subject}</span>
-                            <span className="shrink-0 normal-case tracking-normal">{formatThreadTime(thread.updated_at)}</span>
+                          <button
+                            type="button"
+                            aria-label={`Delete ${thread.title}`}
+                            disabled={deletingThreadId === thread.id}
+                            onClick={() => void handleDeleteThread(thread)}
+                            className="absolute right-2.5 top-2.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-rose-500/10 dark:hover:text-rose-200"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                          <div className="pr-8">
+                            <button
+                              type="button"
+                              onClick={() => void loadThread(thread.id)}
+                              className="min-w-0 w-full text-left"
+                            >
+                              <p className="truncate text-[13px] font-semibold leading-5 text-ink dark:text-white">{thread.title}</p>
+                              <div className="mt-0.5 flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-slate-400">
+                                <p className="min-w-0 truncate">{thread.subject}</p>
+                                <span className="whitespace-nowrap normal-case tracking-normal">{formatThreadTime(thread.updated_at)}</span>
+                              </div>
+                              <p className="mt-1.5 text-[13px] leading-5 text-slate-500 dark:text-slate-300">{thread.latest_message_preview}</p>
+                            </button>
                           </div>
-                          <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-300">{thread.latest_message_preview}</p>
-                        </button>
+                        </div>
                       ))
                     ) : (
                       <div className="premium-subtle rounded-2xl border-dashed px-4 py-5 text-sm text-slate-500 dark:text-slate-400">
@@ -520,6 +588,10 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                   <Home className="h-4 w-4" />
                   Home
                 </Link>
+                <Link href="/feedback" className="premium-card inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:text-ink dark:text-slate-200 dark:hover:text-white">
+                  <MessageSquareText className="h-4 w-4" />
+                  Feedback
+                </Link>
                 <button type="button" onClick={() => setSettingsOpen(true)} className="premium-card inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:text-ink dark:text-slate-200 dark:hover:text-white">
                   <Settings2 className="h-4 w-4" />
                   Settings
@@ -538,7 +610,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <div className="space-y-2">
                   <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-500">AI Prompt</p>
                   <p className="text-sm text-slate-500 dark:text-slate-300">
-                    Start a new tutoring thread or keep an existing one going. SigmaSolve will use recent thread context so follow-up questions feel continuous.
+                    Start a new tutoring thread or keep an existing one going. Veridia will use recent thread context so follow-up questions feel continuous.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -552,18 +624,13 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                     </div>
                   )}
                 </div>
-                <select
-                  className={fieldClassName}
+                <PromptSubjectSelect
+                  label="Subject"
+                  options={subjectOptions}
                   value={promptForm.subject}
                   disabled={Boolean(activeThread)}
-                  onChange={(event) => setPromptForm((current) => ({ ...current, subject: event.target.value }))}
-                >
-                  {subjectOptions.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setPromptForm((current) => ({ ...current, subject: value }))}
+                />
                 <textarea
                   className={`${textareaClassName} min-h-56`}
                   placeholder={
@@ -589,9 +656,9 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <input className={fieldClassName} placeholder="Lab title" value={labForm.lab_title} onChange={(event) => setLabForm((current) => ({ ...current, lab_title: event.target.value }))} />
-                  <select className={fieldClassName} value={labForm.subject} onChange={(event) => setLabForm((current) => ({ ...current, subject: event.target.value }))}>
+                  <FieldSelect value={labForm.subject} onChange={(event) => setLabForm((current) => ({ ...current, subject: event.target.value }))}>
                     {subjectOptions.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
-                  </select>
+                  </FieldSelect>
                 </div>
                 <textarea className={`${textareaClassName} min-h-28`} placeholder="Describe the lab and its objective." value={labForm.description} onChange={(event) => setLabForm((current) => ({ ...current, description: event.target.value }))} />
                 <textarea className={`${textareaClassName} min-h-24`} placeholder="Methods / procedure" value={labForm.methods} onChange={(event) => setLabForm((current) => ({ ...current, methods: event.target.value }))} />
@@ -611,9 +678,9 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <input className={fieldClassName} placeholder="Graph title" value={graphForm.title} onChange={(event) => setGraphForm((current) => ({ ...current, title: event.target.value }))} />
-                  <select className={fieldClassName} value={graphForm.graph_type} onChange={(event) => setGraphForm((current) => ({ ...current, graph_type: event.target.value }))}>
+                  <FieldSelect value={graphForm.graph_type} onChange={(event) => setGraphForm((current) => ({ ...current, graph_type: event.target.value }))}>
                     <option value="line">Line graph</option><option value="scatter">Scatter plot</option>
-                  </select>
+                  </FieldSelect>
                 </div>
                 <input className={fieldClassName} placeholder="Equation, e.g. sin(x) or x^2 + 3*x" value={graphForm.equation} onChange={(event) => setGraphForm((current) => ({ ...current, equation: event.target.value }))} />
                 <div className="grid gap-4 md:grid-cols-3">
@@ -648,11 +715,11 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <span>{usageLabel}</span>
               </div>
             </div>
-            <div className={cn("premium-card mt-5 rounded-[1.5rem] p-5", activeTab === "ai_prompt" || response || graphUrl ? "min-h-0" : "min-h-[28rem]")}>
+            <div className={cn("mt-5", activeTab === "ai_prompt" || response || graphUrl ? "min-h-0" : "min-h-[28rem]")}>
               {activeTab === "ai_prompt" ? (
                 <div
                   ref={conversationScrollRef}
-                  className="premium-scroll premium-subtle h-[28rem] min-h-[20rem] max-h-[75vh] resize-y overflow-y-auto rounded-[1.5rem] p-4 pr-3"
+                  className="premium-scroll premium-card h-[28rem] min-h-[20rem] max-h-[75vh] resize-y overflow-y-auto rounded-[1.5rem] p-4 pr-3"
                 >
                   {conversationMessages.length > 0 ? (
                     <div className="space-y-4">
@@ -668,7 +735,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                         >
                           <div className="mb-3 flex items-center justify-between gap-3">
                             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                              {message.role === "assistant" ? "SigmaSolve" : "You"}
+                              {message.role === "assistant" ? "Veridia" : "You"}
                             </p>
                             <p className="text-xs text-slate-400">{formatThreadTime(message.created_at)}</p>
                           </div>
@@ -681,7 +748,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <div className="premium-subtle flex h-full min-h-[18rem] items-center justify-center rounded-[1.5rem] border-dashed px-6 text-center text-slate-500 dark:text-slate-400">
+                    <div className="flex h-full min-h-[18rem] items-center justify-center rounded-[1.5rem] border border-dashed border-[var(--border-soft)] bg-transparent px-6 text-center text-slate-500 dark:text-slate-400">
                       {loadingThread
                         ? "Loading conversation..."
                         : "Start a new AI conversation or open one from the sidebar to continue where you left off."}
@@ -689,16 +756,18 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                   )}
                 </div>
               ) : response ? (
-                <ResponseRenderer content={response} />
+                <div className="premium-card rounded-[1.5rem] p-5">
+                  <ResponseRenderer content={response} />
+                </div>
               ) : graphUrl ? (
-                <div className="space-y-4">
+                <div className="premium-card space-y-4 rounded-[1.5rem] p-5">
                   <img src={graphUrl} alt="Generated graph" className="w-full rounded-3xl border border-slate-100 shadow-soft dark:border-white/10" />
                   <a href={graphUrl} download className="inline-flex rounded-full bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_34px_rgba(31,143,85,0.24)]">
                     Download graph
                   </a>
                 </div>
               ) : (
-                <div className="premium-subtle flex h-full min-h-[24rem] items-center justify-center rounded-[1.5rem] border-dashed px-6 text-center text-slate-500 dark:text-slate-400">
+                <div className="premium-card flex h-full min-h-[24rem] items-center justify-center rounded-[1.5rem] px-6 text-center text-slate-500 dark:text-slate-400">
                   Generated explanations, lab reports, and graphs will appear here after you submit a request.
                 </div>
               )}
@@ -750,5 +819,154 @@ function SidebarButton({
       <Icon className="h-5 w-5" />
       {label}
     </button>
+  );
+}
+
+function PromptSubjectSelect({
+  value,
+  options,
+  onChange,
+  disabled,
+  label,
+}: {
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  label?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function handlePointerDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    window.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("mousedown", handlePointerDown);
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (disabled) {
+      setOpen(false);
+    }
+  }, [disabled]);
+
+  return (
+    <div ref={rootRef} className="space-y-2">
+      {label ? <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">{label}</p> : null}
+      <div className="relative">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => setOpen((current) => !current)}
+          className={cn(
+            "premium-input flex min-h-[3.5rem] w-full items-center justify-between rounded-[1.15rem] px-4 py-3 text-left transition disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-900/80",
+            open && "border-[var(--accent)] shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent)_16%,transparent),0_14px_36px_rgba(16,32,22,0.1)]"
+          )}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+        >
+          <span className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] dark:bg-brand-500/18 dark:text-brand-200">
+              <BrainCircuit className="h-4 w-4" />
+            </span>
+            <span>
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400">AI Prompt Subject</span>
+              <span className="mt-1 block text-base font-medium text-ink dark:text-white">{value}</span>
+            </span>
+          </span>
+          <span className={cn("text-slate-400 transition", open && "rotate-180 text-brand-500 dark:text-brand-200")}>
+            <ChevronDown className="h-4 w-4" />
+          </span>
+        </button>
+
+        {open ? (
+          <div className="premium-card absolute left-0 right-0 top-[calc(100%+0.75rem)] z-20 overflow-hidden rounded-[1.25rem] p-2 shadow-[0_22px_46px_rgba(16,32,22,0.16)]">
+            <div className="premium-scroll max-h-72 space-y-1 overflow-y-auto pr-1">
+              {options.map((option) => {
+                const selected = option === value;
+
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => {
+                      onChange(option);
+                      setOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center justify-between rounded-[1rem] px-3 py-3 text-left transition",
+                      selected
+                        ? "premium-accent text-brand-700 dark:text-brand-100"
+                        : "text-slate-700 hover:bg-slate-50 hover:text-ink dark:text-slate-200 dark:hover:bg-white/5 dark:hover:text-white"
+                    )}
+                  >
+                    <span className="block text-sm font-semibold">{option}</span>
+                    <span className={cn("flex h-8 w-8 items-center justify-center rounded-full", selected ? "bg-white/70 dark:bg-white/10" : "text-transparent")}>
+                      <Check className="h-4 w-4" />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function FieldSelect({
+  children,
+  className,
+  icon: Icon,
+  label,
+  ...props
+}: SelectHTMLAttributes<HTMLSelectElement> & {
+  icon?: ComponentType<{ className?: string }>;
+  label?: string;
+}) {
+  return (
+    <div className="space-y-2">
+      {label ? <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">{label}</p> : null}
+      <div className="group relative">
+        {Icon ? (
+          <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-brand-500 dark:text-brand-200">
+            <Icon className="h-4 w-4" />
+          </div>
+        ) : null}
+        <select
+          className={cn(
+            selectClassName,
+            Icon ? "pl-11" : "",
+            "group-hover:border-[var(--border-strong)]",
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400 transition group-hover:text-brand-500 dark:group-hover:text-brand-200">
+          <ChevronDown className="h-4 w-4" />
+        </div>
+      </div>
+    </div>
   );
 }

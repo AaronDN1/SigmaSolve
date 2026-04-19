@@ -1,10 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { ArrowRight, BadgeCheck, BrainCircuit, ChartSpline, FlaskConical } from "lucide-react";
-
-import { Button } from "@/components/shared/button";
+import { BadgeCheck, BrainCircuit, ChartSpline, FlaskConical } from "lucide-react";
 
 const highlights = [
   "Explains STEM work like a strong tutor, not a generic chatbot",
@@ -22,7 +19,7 @@ const cardTransition = { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const };
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-6 pb-24 pt-14 lg:px-8 lg:pt-20">
+    <section className="relative overflow-hidden px-6 pb-24 pt-6 lg:px-8 lg:pt-10">
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -31,7 +28,7 @@ export function Hero() {
           className="space-y-9"
         >
           <div className="premium-accent inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-slate-700 dark:text-slate-100">
-            <BadgeCheck className="h-4 w-4 text-brand-500 dark:text-brand-100" />
+            <BadgeCheck className="h-4 w-4 text-brand-500 dark:text-brand-200" />
             Public Beta - features currently free
           </div>
 
@@ -40,21 +37,9 @@ export function Hero() {
               Focused AI support for homework, lab reports, and graphing.
             </h1>
             <p className="max-w-2xl text-xl leading-9 text-slate-600 dark:text-slate-300">
-              SigmaSolve gives STEM students a cleaner, smarter workspace for asking hard questions, drafting strong
+              Veridia gives STEM students a cleaner, smarter workspace for asking hard questions, drafting strong
               lab reports, and generating academic-quality graphs in a product built around clarity instead of clutter.
             </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <Link href="/app">
-              <Button className="gap-2">
-                Start solving
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/signin">
-              <Button variant="secondary">Sign in with Google</Button>
-            </Link>
           </div>
 
           <div className="grid gap-4 pt-1 md:grid-cols-3">
@@ -92,63 +77,58 @@ export function Hero() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="glass-panel rounded-[2.1rem] p-5 md:p-6"
+          className="glass-panel rounded-[2.1rem] p-6 md:p-8"
         >
-          <div className="premium-card overflow-hidden rounded-[1.75rem] p-6 md:p-8">
-            <div className="mb-6 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-500">Workspace snapshot</p>
-                <p className="mt-3 text-2xl font-semibold text-ink dark:text-white">Clear tools. Calm layout. Stronger output.</p>
-              </div>
-              <div className="premium-accent rounded-full px-3 py-1 text-xs font-semibold text-brand-700 dark:text-brand-100">
-                Theme-aware
-              </div>
+          <div className="mb-6">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-500">Workspace snapshot</p>
+              <p className="mt-3 text-2xl font-semibold text-ink dark:text-white">Clear tools. Calm layout. Stronger output.</p>
             </div>
+          </div>
 
-            <div className="grid gap-5 md:grid-cols-2">
-              {[
-                {
-                  icon: BrainCircuit,
-                  title: "AI Prompt",
-                  body:
-                    "Ask about calculus, circuits, thermodynamics, statistics, or study strategy and get polished, guided explanations."
-                },
-                {
-                  icon: FlaskConical,
-                  title: "Lab Helper",
-                  body:
-                    "Convert raw notes, methods, observations, and data into a strong first-draft report with academic structure."
-                }
-              ].map(({ icon: Icon, title, body }) => (
-                <motion.div
-                  key={title}
-                  whileHover={{ y: -4 }}
-                  transition={cardTransition}
-                  className="premium-subtle rounded-[1.7rem] p-5"
-                >
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:bg-brand-500/12 dark:text-brand-100">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{title}</p>
-                  <p className="mt-3 text-lg leading-8 text-slate-700 dark:text-slate-100">{body}</p>
-                </motion.div>
-              ))}
-
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              {
+                icon: BrainCircuit,
+                title: "AI Prompt",
+                body:
+                  "Ask about calculus, circuits, thermodynamics, statistics, or study strategy and get polished, guided explanations."
+              },
+              {
+                icon: FlaskConical,
+                title: "Lab Helper",
+                body:
+                  "Convert raw notes, methods, observations, and data into a strong first-draft report with academic structure."
+              }
+            ].map(({ icon: Icon, title, body }) => (
               <motion.div
+                key={title}
                 whileHover={{ y: -4 }}
                 transition={cardTransition}
-                className="premium-subtle rounded-[1.7rem] p-5 md:col-span-2"
+                className="premium-subtle rounded-[1.7rem] p-5"
               >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:bg-brand-500/12 dark:text-brand-100">
-                  <ChartSpline className="h-5 w-5" />
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:bg-brand-500/18 dark:text-brand-200">
+                  <Icon className="h-5 w-5" />
                 </div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Graphing</p>
-                <p className="mt-3 text-lg leading-8 text-slate-700 dark:text-slate-100">
-                  Plot equations, scatter data, and lab measurements using Python-based generation and download the
-                  result immediately.
-                </p>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{title}</p>
+                <p className="mt-3 text-lg leading-8 text-slate-700 dark:text-slate-100">{body}</p>
               </motion.div>
-            </div>
+            ))}
+
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={cardTransition}
+              className="premium-subtle rounded-[1.7rem] p-5 md:col-span-2"
+            >
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:bg-brand-500/18 dark:text-brand-200">
+                <ChartSpline className="h-5 w-5" />
+              </div>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Graphing</p>
+              <p className="mt-3 text-lg leading-8 text-slate-700 dark:text-slate-100">
+                Plot equations, scatter data, and lab measurements using Python-based generation and download the
+                result immediately.
+              </p>
+            </motion.div>
           </div>
         </motion.div>
       </div>

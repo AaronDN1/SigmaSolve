@@ -14,7 +14,7 @@ const features = [
   {
     icon: UploadCloud,
     title: "Image and PDF context",
-    body: "Attach homework screenshots, lab sheets, or reference pages so Sigma Solve answers with the actual material in view."
+    body: "Attach homework screenshots, lab sheets, or reference pages so Veridia answers with the actual material in view."
   },
   {
     icon: FileChartColumnIncreasing,
@@ -45,7 +45,7 @@ export function Features() {
         <SectionHeading
           eyebrow="Features"
           title="Everything is designed around serious STEM workflows."
-          description="Sigma Solve is opinionated about quality: clear explanations, strong academic structure, clean visuals, and a product surface that feels reliable enough to use every day."
+          description="Veridia is opinionated about quality: clear explanations, strong academic structure, clean visuals, and a product surface that feels reliable enough to use every day."
         />
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -59,7 +59,7 @@ export function Features() {
               whileHover={{ y: -5 }}
               className="glass-panel rounded-[1.85rem] p-7"
             >
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] dark:bg-brand-500/12 dark:text-brand-100">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] dark:bg-brand-500/18 dark:text-brand-200">
                 <Icon className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold text-ink dark:text-white">{title}</h3>

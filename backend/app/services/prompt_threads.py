@@ -240,3 +240,9 @@ def list_history_threads(db: Session, user: User) -> list[PromptConversationThre
         .all()
     )
     return [serialize_thread_summary(thread) for thread in threads if thread.messages]
+
+
+def delete_prompt_thread(db: Session, user: User, thread_id: UUID) -> None:
+    thread = get_thread_or_404(db, user, thread_id)
+    db.delete(thread)
+    db.commit()

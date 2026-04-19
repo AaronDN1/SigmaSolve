@@ -47,7 +47,7 @@ export default function WorkspacePage() {
   if (loading || !user || !usage || !dashboard) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
-        <div className="glass-panel rounded-[2rem] px-8 py-6 text-sm font-medium text-slate-600">Loading Sigma Solve...</div>
+        <div className="glass-panel rounded-[2rem] px-8 py-6 text-sm font-medium text-slate-600">Loading Veridia...</div>
       </main>
     );
   }

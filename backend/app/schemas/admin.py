@@ -17,3 +17,12 @@ class AdminUserSummary(BaseModel):
 
 class AdminUserOverrideUpdate(BaseModel):
     manual_unlimited_override: bool
+
+
+class AdminFeedbackSummary(BaseModel):
+    id: UUID
+    user_id: UUID | None
+    submitter_email: str | None
+    subject: str
+    body: str
+    created_at: datetime

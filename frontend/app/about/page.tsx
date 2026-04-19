@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, BrainCircuit, BriefcaseBusiness, Boxes, Sparkles } from "lucide-react";
 
 import { MarketingNav } from "@/components/landing/marketing-nav";
+import { SiteFootnote } from "@/components/landing/site-footnote";
 import { Button } from "@/components/shared/button";
 
 const focusAreas = [
@@ -34,15 +35,15 @@ const profileHighlights = [
 const detailSections = [
   {
     eyebrow: "What I Built",
-    title: "The SigmaSolve Project.",
+    title: "The Veridia Project.",
     body:
-      "I built SigmaSolve as a focused AI workspace for STEM students who need clearer problem solving, better explanations, and cleaner outputs. That meant shaping the product from end to end: workflow design, AI model selection and integration, prompt behavior, frontend and backend implementation decisions, threaded conversations, analytics, usage controls, and the math-rendering and UX details that make the experience usable instead of frustrating."
+      "I built Veridia as a focused AI workspace for STEM students who need clearer problem solving, better explanations, and cleaner outputs. That meant shaping the product from end to end: workflow design, AI model selection and integration, prompt behavior, frontend and backend implementation decisions, threaded conversations, analytics, usage controls, and the math-rendering and UX details that make the experience usable instead of frustrating."
   },
   {
     eyebrow: "Execution Story",
     title: "The idea was there before the acceleration.",
     body:
-      "I had the idea for SigmaSolve for a while and made multiple attempts to build a version I actually liked. The turning point came after I found the Codex challenge on Handshake. Codex accelerated execution, iteration, and debugging, but it did not replace engineering judgment. I knew what I wanted to build, how I wanted it to work, and used AI tooling as leverage to turn that into a real product faster."
+      "I had the idea for Veridia for a while and made multiple attempts to build a version I actually liked. The turning point came after I found the Codex challenge on Handshake. Codex accelerated execution, iteration, and debugging, but it did not replace engineering judgment. I knew what I wanted to build, how I wanted it to work, and used AI tooling as leverage to turn that into a real product faster."
   },
   {
     eyebrow: "What I Work On",
@@ -82,7 +83,7 @@ export default function AboutPage() {
                   Aaron Nathans
                 </h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-                  I am a student engineer focused on intelligent systems, product execution, and turning technically complex ideas into software that feels clear and useful. SigmaSolve is the best example of how I work: identify a real workflow, design it intentionally, and then build the system behind it well enough that the user experience holds together.
+                  I am a student engineer focused on intelligent systems, product execution, and turning technically complex ideas into software that feels clear and useful. Veridia is the best example of how I work: identify a real workflow, design it intentionally, and then build the system behind it well enough that the user experience holds together.
                 </p>
                 <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600 dark:text-slate-300">
                   I graduate in May 2026 with a B.S. in Physics and in December 2026 with an M.E. in Applied Artificial Intelligence. I am looking for opportunities across AI engineering, machine learning, and applied AI.
@@ -102,7 +103,7 @@ export default function AboutPage() {
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link href="/app">
                     <Button>
-                      Open SigmaSolve
+                      Open Veridia
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
@@ -178,6 +179,7 @@ export default function AboutPage() {
           </section>
         </div>
       </section>
+      <SiteFootnote />
     </main>
   );
 }

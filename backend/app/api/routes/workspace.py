@@ -22,6 +22,7 @@ from app.services.openai_service import generate_lab_report
 from app.services.prompt_threads import (
     continue_prompt_thread,
     create_prompt_thread,
+    delete_prompt_thread,
     get_thread_or_404,
     list_history_threads,
     list_recent_threads,
@@ -166,6 +167,12 @@ def prompt_thread_history(user=Depends(get_current_user), db: Session = Depends(
 @router.get("/prompt/threads/{thread_id}", response_model=PromptConversationThreadResponse)
 def get_prompt_thread(thread_id: UUID, user=Depends(get_current_user), db: Session = Depends(get_db)):
     return serialize_thread(get_thread_or_404(db, user, thread_id))
+
+
+@router.delete("/prompt/threads/{thread_id}")
+def delete_prompt_thread_route(thread_id: UUID, user=Depends(get_current_user), db: Session = Depends(get_db)):
+    delete_prompt_thread(db, user, thread_id)
+    return {"success": True}
 
 
 @router.post("/lab-helper", response_model=ToolTextResponse)

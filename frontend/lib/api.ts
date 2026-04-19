@@ -1,6 +1,7 @@
 import type {
   AdminUserSummary,
   DashboardData,
+  FeedbackSubmission,
   PromptConversationSummary,
   PromptConversationThread,
   PromptToolResponse,
@@ -136,6 +137,12 @@ export function getPromptThread(threadId: string) {
   }, "ai_prompt");
 }
 
+export function deletePromptThread(threadId: string) {
+  return request<{ success: boolean }>(`/api/workspace/prompt/threads/${threadId}`, {
+    method: "DELETE"
+  }, "ai_prompt");
+}
+
 export function getRecentPromptThreads() {
   return request<PromptConversationSummary[]>("/api/workspace/prompt/threads/recent", {
     method: "GET",
@@ -161,6 +168,20 @@ export function updateAdminUserOverride(userId: string, manualUnlimitedOverride:
   return request<AdminUserSummary>(`/api/admin/users/${userId}`, {
     method: "PATCH",
     body: JSON.stringify({ manual_unlimited_override: manualUnlimitedOverride })
+  });
+}
+
+export function createFeedback(payload: { subject: string; body: string }) {
+  return request<FeedbackSubmission>("/api/feedback", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function getAdminFeedback() {
+  return request<FeedbackSubmission[]>("/api/admin/feedback", {
+    method: "GET",
+    cache: "no-store"
   });
 }
 

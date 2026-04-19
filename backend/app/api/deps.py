@@ -43,6 +43,24 @@ def get_current_user(
     return user
 
 
+def get_optional_user(
+    db: Session = Depends(get_db),
+    session_token: str | None = Cookie(default=None, alias=settings.session_cookie_name),
+) -> User | None:
+    if not session_token:
+        return None
+
+    try:
+        payload = decode_session_token(session_token)
+    except Exception:
+        return None
+
+    try:
+        return db.query(User).filter(User.id == UUID(payload["sub"])).first()
+    except Exception:
+        return None
+
+
 def get_admin_user(user: User = Depends(get_current_user)) -> User:
     if not is_admin_email(user.email):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required.")

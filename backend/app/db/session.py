@@ -21,7 +21,7 @@ def get_db():
 
 
 def create_db_and_tables() -> None:
-    from app.models import generated_output, oauth_identity, prompt_thread, subscription, uploaded_file, usage, user  # noqa: F401
+    from app.models import feedback, generated_output, oauth_identity, prompt_thread, subscription, uploaded_file, usage, user  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
     ensure_backward_compatible_schema()

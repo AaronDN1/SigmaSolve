@@ -19,7 +19,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Sigma Solve",
+  title: "Veridia",
   description: "Premium AI study support for STEM students."
 };
 

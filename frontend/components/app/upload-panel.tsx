@@ -17,7 +17,7 @@ export function UploadPanel({ purpose, files, loading, onUpload, onRemove }: Pro
   return (
     <div className="premium-subtle rounded-[1.5rem] border-dashed p-5">
       <div className="flex items-center gap-3">
-        <div className="premium-card flex h-10 w-10 items-center justify-center rounded-2xl text-brand-500 dark:text-brand-100">
+        <div className="premium-card flex h-10 w-10 items-center justify-center rounded-2xl text-brand-500 dark:text-brand-200">
           <UploadCloud className="h-5 w-5" />
         </div>
         <div>

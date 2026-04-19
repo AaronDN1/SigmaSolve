@@ -78,3 +78,12 @@ export type AdminUserSummary = {
   paid_unlimited_access: boolean;
   created_at: string;
 };
+
+export type FeedbackSubmission = {
+  id: string;
+  user_id: string | null;
+  submitter_email: string | null;
+  subject: string;
+  body: string;
+  created_at: string;
+};

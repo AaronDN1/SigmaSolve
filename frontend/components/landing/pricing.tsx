@@ -10,7 +10,7 @@ export function Pricing() {
       <div className="mx-auto max-w-7xl space-y-12">
         <SectionHeading
           eyebrow="Public Beta"
-          title="Sigma Solve is currently open for public testing."
+          title="Veridia is currently open for public testing."
           description="We are validating the product with real student workflows before formal launch. During beta, every signed-in user gets full access to AI Prompt, Lab Helper, and Graphing."
         />
 

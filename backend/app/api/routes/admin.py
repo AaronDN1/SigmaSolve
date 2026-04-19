@@ -5,8 +5,9 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_admin_user
 from app.db.session import get_db
+from app.models.feedback import FeedbackSubmission
 from app.models.user import User
-from app.schemas.admin import AdminUserOverrideUpdate, AdminUserSummary
+from app.schemas.admin import AdminFeedbackSummary, AdminUserOverrideUpdate, AdminUserSummary
 from app.services.access import (
     get_effective_access_source,
     get_effective_access_status,
@@ -35,6 +36,22 @@ def serialize_admin_user(db: Session, user: User) -> AdminUserSummary:
 def list_users(_: User = Depends(get_admin_user), db: Session = Depends(get_db)):
     users = db.query(User).order_by(User.created_at.desc()).all()
     return [serialize_admin_user(db, user) for user in users]
+
+
+@router.get("/feedback", response_model=list[AdminFeedbackSummary])
+def list_feedback(_: User = Depends(get_admin_user), db: Session = Depends(get_db)):
+    feedback_items = db.query(FeedbackSubmission).order_by(FeedbackSubmission.created_at.desc()).all()
+    return [
+        AdminFeedbackSummary(
+            id=item.id,
+            user_id=item.user_id,
+            submitter_email=item.submitter_email,
+            subject=item.subject,
+            body=item.body,
+            created_at=item.created_at,
+        )
+        for item in feedback_items
+    ]
 
 
 @router.patch("/users/{user_id}", response_model=AdminUserSummary)

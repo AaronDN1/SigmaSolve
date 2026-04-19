@@ -23,7 +23,7 @@ export function Cta() {
               A cleaner, more convincing STEM workflow starts here.
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
-              SigmaSolve is currently free to use during public beta, with a simple 20-prompt daily cap to keep the
+              Veridia is currently free to use during public beta, with a simple 20-prompt daily cap to keep the
               experience stable while the product matures.
             </p>
           </div>
