@@ -17,9 +17,16 @@ def verify_google_credential(credential: str) -> dict[str, Any]:
     return id_token.verify_oauth2_token(credential, requests.Request(), settings.google_client_id)
 
 
-def get_or_create_user_from_google(db: Session, claims: dict[str, Any]) -> User:
+def get_or_create_user_from_google(
+    db: Session,
+    claims: dict[str, Any],
+    *,
+    accepted_terms: bool = False,
+    accepted_privacy: bool = False,
+) -> tuple[User, bool]:
     google_sub = claims["sub"]
     email = claims["email"]
+    accepted_at = datetime.now(timezone.utc)
 
     identity = (
         db.query(OAuthIdentity)
@@ -33,28 +40,44 @@ def get_or_create_user_from_google(db: Session, claims: dict[str, Any]) -> User:
         user = identity.user
         user.full_name = claims.get("name", user.full_name)
         user.avatar_url = claims.get("picture", user.avatar_url)
+        if accepted_terms and not user.accepted_terms_at:
+            user.accepted_terms_at = accepted_at
+        if accepted_privacy and not user.accepted_privacy_at:
+            user.accepted_privacy_at = accepted_at
         db.commit()
         db.refresh(user)
-        return user
+        return user, False
 
     user = db.query(User).filter(User.email == email).first()
+    if not user and not (accepted_terms and accepted_privacy):
+        raise ValueError("Please review and accept the Terms of Service and Privacy Policy to create your account.")
+
+    created = False
     if not user:
         user = User(
             email=email,
             full_name=claims.get("name", email.split("@")[0]),
             avatar_url=claims.get("picture"),
             plan_type=PlanType.FREE,
+            accepted_terms_at=accepted_at,
+            accepted_privacy_at=accepted_at,
         )
         db.add(user)
         db.flush()
         db.add(Subscription(user_id=user.id, status=SubscriptionStatus.INACTIVE))
         db.add(DailyUsage(user_id=user.id))
+        created = True
+    else:
+        if accepted_terms and not user.accepted_terms_at:
+            user.accepted_terms_at = accepted_at
+        if accepted_privacy and not user.accepted_privacy_at:
+            user.accepted_privacy_at = accepted_at
 
     identity = OAuthIdentity(user_id=user.id, provider=ProviderName.GOOGLE, provider_user_id=google_sub)
     db.add(identity)
     db.commit()
     db.refresh(user)
-    return user
+    return user, created
 
 
 def create_session_token(user: User) -> str:

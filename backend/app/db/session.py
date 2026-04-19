@@ -44,3 +44,11 @@ def ensure_backward_compatible_schema() -> None:
                     "ALTER TABLE users ADD COLUMN IF NOT EXISTS account_status VARCHAR(24) NOT NULL DEFAULT 'active'"
                 )
             )
+        if "accepted_terms_at" not in columns:
+            connection.execute(
+                text("ALTER TABLE users ADD COLUMN IF NOT EXISTS accepted_terms_at TIMESTAMP WITH TIME ZONE NULL")
+            )
+        if "accepted_privacy_at" not in columns:
+            connection.execute(
+                text("ALTER TABLE users ADD COLUMN IF NOT EXISTS accepted_privacy_at TIMESTAMP WITH TIME ZONE NULL")
+            )

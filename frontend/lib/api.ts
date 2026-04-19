@@ -47,10 +47,17 @@ export function getSession(): Promise<SessionResponse> {
   return request("/api/auth/session", { method: "GET", cache: "no-store" });
 }
 
-export function signInWithGoogle(credential: string): Promise<SessionResponse> {
+export function signInWithGoogle(
+  credential: string,
+  options?: { accepted_terms?: boolean; accepted_privacy?: boolean }
+): Promise<SessionResponse> {
   return request("/api/auth/google", {
     method: "POST",
-    body: JSON.stringify({ credential })
+    body: JSON.stringify({
+      credential,
+      accepted_terms: options?.accepted_terms ?? false,
+      accepted_privacy: options?.accepted_privacy ?? false
+    })
   });
 }
 

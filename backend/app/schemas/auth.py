@@ -6,6 +6,8 @@ from pydantic import BaseModel, EmailStr
 
 class GoogleSignInRequest(BaseModel):
     credential: str
+    accepted_terms: bool = False
+    accepted_privacy: bool = False
 
 
 class UserResponse(BaseModel):

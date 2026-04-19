@@ -20,7 +20,15 @@ def google_sign_in(payload: GoogleSignInRequest, response: Response, db: Session
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Google sign-in failed.") from exc
 
-    user = get_or_create_user_from_google(db, claims)
+    try:
+        user, _ = get_or_create_user_from_google(
+            db,
+            claims,
+            accepted_terms=payload.accepted_terms,
+            accepted_privacy=payload.accepted_privacy,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     ensure_account_is_active(user)
     token = create_session_token(user)
     capture_analytics_event(
