@@ -216,13 +216,13 @@ export function runLabHelper(payload: {
 
 export function generateGraph(payload: {
   title: string;
-  x_label: string;
-  y_label: string;
+  x_label?: string;
+  y_label?: string;
   graph_type: string;
   equation?: string;
-  x_min: number;
-  x_max: number;
-  sample_count: number;
+  x_min?: number;
+  x_max?: number;
+  sample_count?: number;
   series: Array<{ x: number[]; y: number[]; label?: string }>;
 }) {
   return request<{ image_url: string; download_url: string; usage_remaining: number | null }>(

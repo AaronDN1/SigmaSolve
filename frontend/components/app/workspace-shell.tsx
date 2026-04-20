@@ -83,6 +83,13 @@ const fieldClassName =
 const textareaClassName = "premium-input rounded-[1.5rem] px-4 py-4 text-sm";
 const selectClassName =
   "premium-input w-full appearance-none rounded-2xl px-4 py-3 pr-12 text-sm font-medium disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-900/80";
+const graphTypeOptions = [
+  { value: "line", label: "Line graph" },
+  { value: "scatter", label: "Scatter plot" },
+  { value: "bar", label: "Bar chart" },
+  { value: "histogram", label: "Histogram" },
+  { value: "area", label: "Area plot" },
+] as const;
 
 function formatThreadTime(value: string) {
   return new Intl.DateTimeFormat(undefined, {
@@ -126,18 +133,26 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
     notes: ""
   });
   const [graphForm, setGraphForm] = useState({
-    title: "Position vs Time",
-    x_label: "Time (s)",
-    y_label: "Position (m)",
+    title: "",
+    x_label: "",
+    y_label: "",
     graph_type: "line",
-    equation: "sin(x)",
-    x_min: -10,
-    x_max: 10,
-    sample_count: 200,
-    rawX: "0,1,2,3,4",
-    rawY: "0,1.4,2.9,4.1,5.2",
-    label: "Measured data"
+    equation: "",
+    x_min: "",
+    x_max: "",
+    sample_count: "",
+    rawX: "",
+    rawY: "",
+    label: ""
   });
+
+  const supportsEquation = graphForm.graph_type !== "bar" && graphForm.graph_type !== "histogram";
+  const needsYSeries = graphForm.graph_type !== "histogram";
+  const usesEquationRange = supportsEquation && Boolean(graphForm.equation.trim());
+  const seriesHelperText =
+    graphForm.graph_type === "histogram"
+      ? "Enter the values to group into bins. The histogram counts how often values fall within each range."
+      : "Enter matching comma-separated values for the X and Y series when plotting measured data.";
 
   const usageLabel = useMemo(() => {
     if (usageState.remaining_today === null) return "Unlimited access";
@@ -372,22 +387,40 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
     trackGraphingStarted({
       feature_name: "graphing",
       graph_type: graphForm.graph_type,
-      has_equation: Boolean(graphForm.equation),
-      series_count: graphForm.rawX.trim() && graphForm.rawY.trim() ? 1 : 0,
+      has_equation: supportsEquation && Boolean(graphForm.equation.trim()),
+      series_count:
+        graphForm.graph_type === "histogram"
+          ? (graphForm.rawX.trim() ? 1 : 0)
+          : (graphForm.rawX.trim() && graphForm.rawY.trim() ? 1 : 0),
     });
     try {
       const x = graphForm.rawX.split(",").map((value) => Number(value.trim())).filter((value) => !Number.isNaN(value));
       const y = graphForm.rawY.split(",").map((value) => Number(value.trim())).filter((value) => !Number.isNaN(value));
+      const trimmedEquation = graphForm.equation.trim();
+      const trimmedTitle = graphForm.title.trim();
+      const trimmedXLabel = graphForm.x_label.trim();
+      const trimmedYLabel = graphForm.y_label.trim();
+      const trimmedSeriesLabel = graphForm.label.trim();
+      const parsedXMin = graphForm.x_min.trim() ? Number(graphForm.x_min) : undefined;
+      const parsedXMax = graphForm.x_max.trim() ? Number(graphForm.x_max) : undefined;
+      const parsedSampleCount = graphForm.sample_count.trim() ? Number(graphForm.sample_count) : undefined;
       const result = await generateGraph({
-        title: graphForm.title,
-        x_label: graphForm.x_label,
-        y_label: graphForm.y_label,
+        title: trimmedTitle || "Untitled graph",
+        x_label: trimmedXLabel || undefined,
+        y_label: trimmedYLabel || undefined,
         graph_type: graphForm.graph_type,
-        equation: graphForm.equation || undefined,
-        x_min: Number(graphForm.x_min),
-        x_max: Number(graphForm.x_max),
-        sample_count: Number(graphForm.sample_count),
-        series: x.length && y.length ? [{ x, y, label: graphForm.label }] : []
+        equation: supportsEquation && trimmedEquation ? trimmedEquation : undefined,
+        x_min: parsedXMin,
+        x_max: parsedXMax,
+        sample_count: parsedSampleCount,
+        series:
+          graphForm.graph_type === "histogram"
+            ? x.length
+              ? [{ x, y: [], label: trimmedSeriesLabel || undefined }]
+              : []
+            : x.length && y.length
+              ? [{ x, y, label: trimmedSeriesLabel || undefined }]
+              : []
       });
       setActiveThread(null);
       setResponse("");
@@ -397,7 +430,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
         feature_name: "graphing",
         graph_type: graphForm.graph_type,
         response_time_ms: Math.round(performance.now() - startedAt),
-        has_equation: Boolean(graphForm.equation),
+        has_equation: supportsEquation && Boolean(graphForm.equation.trim()),
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to generate graph.");
@@ -692,22 +725,53 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
                 <div className="grid gap-4 md:grid-cols-2">
                   <input className={fieldClassName} placeholder="Graph title" value={graphForm.title} onChange={(event) => setGraphForm((current) => ({ ...current, title: event.target.value }))} />
                   <FieldSelect value={graphForm.graph_type} onChange={(event) => setGraphForm((current) => ({ ...current, graph_type: event.target.value }))}>
-                    <option value="line">Line graph</option><option value="scatter">Scatter plot</option>
+                    {graphTypeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
                   </FieldSelect>
                 </div>
-                <input className={fieldClassName} placeholder="Equation, e.g. sin(x) or x^2 + 3*x" value={graphForm.equation} onChange={(event) => setGraphForm((current) => ({ ...current, equation: event.target.value }))} />
-                <div className="grid gap-4 md:grid-cols-3">
-                  <input className={fieldClassName} placeholder="X label" value={graphForm.x_label} onChange={(event) => setGraphForm((current) => ({ ...current, x_label: event.target.value }))} />
-                  <input className={fieldClassName} placeholder="Y label" value={graphForm.y_label} onChange={(event) => setGraphForm((current) => ({ ...current, y_label: event.target.value }))} />
-                  <input className={fieldClassName} placeholder="Series label" value={graphForm.label} onChange={(event) => setGraphForm((current) => ({ ...current, label: event.target.value }))} />
+                <div className="space-y-2">
+                  <input
+                    className={fieldClassName}
+                    placeholder={supportsEquation ? "Equation, e.g. sin(x) or x^2 + 3*x" : "Equation is not used for this graph type"}
+                    value={graphForm.equation}
+                    disabled={!supportsEquation}
+                    onChange={(event) => setGraphForm((current) => ({ ...current, equation: event.target.value }))}
+                  />
+                  <p className="px-1 text-xs leading-6 text-slate-500 dark:text-slate-400">
+                    {supportsEquation
+                      ? "Leave this blank to plot your own data only."
+                      : "This graph type is built from entered data rather than an equation."}
+                  </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <input type="number" className={fieldClassName} placeholder="x min" value={graphForm.x_min} onChange={(event) => setGraphForm((current) => ({ ...current, x_min: Number(event.target.value) }))} />
-                  <input type="number" className={fieldClassName} placeholder="x max" value={graphForm.x_max} onChange={(event) => setGraphForm((current) => ({ ...current, x_max: Number(event.target.value) }))} />
-                  <input type="number" className={fieldClassName} placeholder="samples" value={graphForm.sample_count} onChange={(event) => setGraphForm((current) => ({ ...current, sample_count: Number(event.target.value) }))} />
+                  <input className={fieldClassName} placeholder="X-axis label" value={graphForm.x_label} onChange={(event) => setGraphForm((current) => ({ ...current, x_label: event.target.value }))} />
+                  <input className={fieldClassName} placeholder={graphForm.graph_type === "histogram" ? "Y-axis label (optional)" : "Y-axis label"} value={graphForm.y_label} onChange={(event) => setGraphForm((current) => ({ ...current, y_label: event.target.value }))} />
+                  <input className={fieldClassName} placeholder={graphForm.graph_type === "histogram" ? "Series label (optional)" : "Series label"} value={graphForm.label} onChange={(event) => setGraphForm((current) => ({ ...current, label: event.target.value }))} />
                 </div>
-                <textarea className={`${textareaClassName} min-h-24`} placeholder="Optional X data, comma separated" value={graphForm.rawX} onChange={(event) => setGraphForm((current) => ({ ...current, rawX: event.target.value }))} />
-                <textarea className={`${textareaClassName} min-h-24`} placeholder="Optional Y data, comma separated" value={graphForm.rawY} onChange={(event) => setGraphForm((current) => ({ ...current, rawY: event.target.value }))} />
+                {usesEquationRange && (
+                  <div className="space-y-2">
+                    <p className="px-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Equation Range</p>
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <input type="number" className={fieldClassName} placeholder="Minimum X value" value={graphForm.x_min} onChange={(event) => setGraphForm((current) => ({ ...current, x_min: event.target.value }))} />
+                      <input type="number" className={fieldClassName} placeholder="Maximum X value" value={graphForm.x_max} onChange={(event) => setGraphForm((current) => ({ ...current, x_max: event.target.value }))} />
+                      <input type="number" className={fieldClassName} placeholder="Sample count" value={graphForm.sample_count} onChange={(event) => setGraphForm((current) => ({ ...current, sample_count: event.target.value }))} />
+                    </div>
+                    <p className="px-1 text-xs leading-6 text-slate-500 dark:text-slate-400">
+                      Leave these blank to use the standard plotting range automatically.
+                    </p>
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <p className="px-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                    {graphForm.graph_type === "histogram" ? "Histogram Data" : "Measured Data"}
+                  </p>
+                  <p className="px-1 text-xs leading-6 text-slate-500 dark:text-slate-400">{seriesHelperText}</p>
+                </div>
+                <textarea className={`${textareaClassName} min-h-24`} placeholder={graphForm.graph_type === "histogram" ? "Values, comma separated" : "X values, comma separated"} value={graphForm.rawX} onChange={(event) => setGraphForm((current) => ({ ...current, rawX: event.target.value }))} />
+                {needsYSeries && (
+                  <textarea className={`${textareaClassName} min-h-24`} placeholder="Y values, comma separated" value={graphForm.rawY} onChange={(event) => setGraphForm((current) => ({ ...current, rawY: event.target.value }))} />
+                )}
                 <Button className="w-full md:w-auto" onClick={handleGraphSubmit} disabled={loadingAction}>{loadingAction ? "Rendering graph..." : "Generate graph"}</Button>
               </div>
             )}
@@ -790,7 +854,7 @@ export function WorkspaceShell({ user, usage, dashboard }: Props) {
               <div className="mt-6">
                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Recent uploads</p>
                 <div className="mt-4 flex flex-wrap gap-3">
-                  {dashboard.uploaded_files.map((file) => (
+                  {dashboard.uploaded_files.slice(0, 3).map((file) => (
                     <a key={file.id} href={file.url} target="_blank" rel="noreferrer" className="premium-card rounded-full px-4 py-2 text-sm text-slate-600 transition hover:-translate-y-0.5 dark:text-slate-200">
                       {file.original_name}
                     </a>

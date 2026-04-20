@@ -87,7 +87,7 @@ export function Hero() {
                 icon: BrainCircuit,
                 title: "AI Prompt",
                 body:
-                  "Ask about calculus, circuits, thermodynamics, statistics, or study strategy and get polished, guided explanations."
+                  "Ask about any STEM subject or related subjects and get polished, guided explanations."
               },
               {
                 icon: FlaskConical,

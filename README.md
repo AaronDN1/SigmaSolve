@@ -1,112 +1,55 @@
-# Sigma Solve
+# Veridia
 
-Sigma Solve is a full-stack STEM learning platform with AI tutoring, lab drafting and Python-powered graph generation.
+Structuring AI to help you learn.
 
-## Architecture
+## Overview
 
-- `frontend/`: Next.js 15, React, TypeScript, Tailwind CSS, KaTeX rendering
-- `backend/`: FastAPI, SQLAlchemy, PostgreSQL, OpenAI Responses API, Stripe, matplotlib
-- `storage/`: local uploaded files and generated graphs for development
+Veridia is an AI-powered STEM learning workspace designed to support real academic workflows, not just generate answers. It helps users ask better questions, receive structured explanations, draft lab reports, and create clean graphs inside a focused interface built around clarity and usability.
 
-This split keeps the UI fast and product-focused while leaving Python responsible for AI orchestration, graph generation, uploads, and business rules.
+## Screenshots
 
-## Project structure
+### Home Page
 
-```text
-SigmaSolve/
-  backend/
-    app/
-      api/
-      core/
-      db/
-      models/
-      schemas/
-      services/
-    storage/
-  frontend/
-    app/
-    components/
-    lib/
-    types/
-  docker-compose.yml
-  .env.example
-```
+![Home Page](./docs/screenshots/home-page.png)
 
-## Backend responsibilities
+### Application Interface
 
-- Google credential verification and session cookie issuance
-- PostgreSQL-backed user, subscription, usage, upload, and output records
-- Stripe checkout and webhook subscription syncing
-- OpenAI prompt orchestration with a strong default STEM tutor system prompt
-- PDF/image upload handling for AI Prompt and Lab Helper
-- Python graph generation with matplotlib
-- Free-tier enforcement at 3 total generations per day
+![Application Interface](./docs/screenshots/application-interface.png)
 
-## Frontend responsibilities
+## Features
 
-- Premium marketing homepage with hero, features, workflow, pricing, and CTA sections
-- Sign-in page with Google Identity Services
-- Logged-in workspace with AI Prompt, Lab Helper, and Graphing tabs
-- KaTeX-backed readable math rendering
-- Upgrade flow entry point for Stripe checkout
+- AI-powered STEM problem solving across subjects such as math, physics, chemistry, statistics, and related technical topics
+- Structured, readable explanations designed to feel guided rather than generic
+- Dedicated graphing workflow with downloadable outputs
+- File uploads for prompt and lab workflows, including PDF, image, and text-based context
+- Threaded AI conversations with recent and history views for continuity
+- Lab Helper workflow for turning rough notes into stronger report drafts
+- Feedback submission flow for product iteration
+- Admin controls for user and feedback review
+- Clean responsive interface with light and dark mode support
 
-## Local setup
+## Tech Stack
 
-1. Start PostgreSQL:
+- Frontend: Next.js 15, React 19, TypeScript, Tailwind CSS, Framer Motion
+- Backend: FastAPI, SQLAlchemy, PostgreSQL, Python
+- AI: OpenAI API
+- Analytics: PostHog
+- Graphing and parsing: matplotlib, NumPy, PyPDF, Pillow
+- Billing and auth: Stripe, Google Identity / Google Auth
 
-```bash
-docker compose up -d postgres
-```
+## How It Works
 
-2. Copy `.env.example` to `.env`, then mirror the relevant values into `backend/.env` and `frontend/.env.local`.
+1. A user submits a prompt, lab draft, or graphing request from the Veridia workspace.
+2. The backend processes the request, attaches any uploaded context, and routes the task through the appropriate service.
+3. OpenAI-generated output is structured and returned to the frontend for readable presentation.
+4. For graphing and file-based workflows, Veridia can generate downloadable visual outputs or use uploaded materials to ground the response.
 
-3. Start the backend:
+## Current Status
 
-```bash
-cd backend
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
+### Public Beta
 
-4. Start the frontend:
+Veridia is currently in a public beta phase. The product is actively being refined through testing, iteration, and user feedback, and features may continue to evolve as the platform matures.
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+## Author
 
-The frontend runs on `http://localhost:3000` and expects the FastAPI API at `http://localhost:8000`.
-
-## Environment variables
-
-### Frontend
-
-- `NEXT_PUBLIC_API_URL`
-- `NEXT_PUBLIC_APP_URL`
-- `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
-- `NEXT_PUBLIC_STRIPE_PRICE_ID`
-
-### Backend
-
-- `DATABASE_URL`
-- `SECRET_KEY`
-- `BACKEND_CORS_ORIGINS`
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_PRICE_ID`
-- `SESSION_COOKIE_NAME`
-
-## Notes
-
-- Usage limits count successful AI Prompt, Lab Helper, and Graphing generations.
-- File storage is local-first in `backend/storage/` and can be swapped for cloud storage later.
-- Mathematical markdown is rendered with KaTeX in the frontend.
-- Tables are auto-created on backend startup for local development.
-- In production, session cookie `secure` handling should be enabled behind HTTPS.
+Aaron Nathans is an engineer focused on intelligent systems, AI-driven products, and turning technically complex ideas into real, usable software. Veridia reflects that approach: practical workflows, thoughtful product design, and engineering aimed at delivering clear value in use.

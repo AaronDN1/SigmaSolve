@@ -83,7 +83,7 @@ export default function AboutPage() {
                   Aaron Nathans
                 </h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-                  I am a student engineer focused on intelligent systems, product execution, and turning technically complex ideas into software that feels clear and useful. Veridia is the best example of how I work: identify a real workflow, design it intentionally, and then build the system behind it well enough that the user experience holds together.
+                  I’m an engineer focused on building intelligent systems that turn complex technical ideas into simple, usable products. My work sits at the intersection of AI, data, and software execution—where understanding a problem deeply matters just as much as building it correctly. Veridia reflects how I approach projects: identify real workflows, design with clarity, and engineer systems that actually deliver value in practice.
                 </p>
                 <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600 dark:text-slate-300">
                   I graduate in May 2026 with a B.S. in Physics and in December 2026 with an M.E. in Applied Artificial Intelligence. I am looking for opportunities across AI engineering, machine learning, and applied AI.
@@ -136,7 +136,7 @@ export default function AboutPage() {
 
                 <div className="premium-accent rounded-[1.75rem] p-6">
                   <p className="text-sm leading-7 text-slate-700 dark:text-slate-200">
-                    Yes, I made my personal website one of my main projects, and yes, I think that was a smart move.
+                    Fun fact! You can find me in the background of the movie Happy Gilmore 2.
                   </p>
                 </div>
               </aside>

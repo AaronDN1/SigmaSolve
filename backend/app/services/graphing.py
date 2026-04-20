@@ -75,17 +75,28 @@ def generate_graph(db: Session, user: User, request: GraphRequest) -> str:
     fig, ax = plt.subplots(figsize=(10, 6), dpi=160)
     ax.set_title(request.title)
     ax.set_xlabel(request.x_label)
-    ax.set_ylabel(request.y_label)
+    ax.set_ylabel("Count" if request.graph_type == "histogram" and request.y_label == "y" else request.y_label)
     ax.grid(True, alpha=0.18)
 
     if request.equation:
         x_values = np.linspace(request.x_min, request.x_max, request.sample_count)
         y_values = _evaluate_equation(request.equation, x_values)
-        ax.plot(x_values, y_values, linewidth=2.4, color="#2563eb", label=request.equation)
+        if request.graph_type == "area":
+            ax.plot(x_values, y_values, linewidth=2.4, color="#2563eb", label=request.equation)
+            ax.fill_between(x_values, y_values, alpha=0.26, color="#2563eb")
+        else:
+            ax.plot(x_values, y_values, linewidth=2.4, color="#2563eb", label=request.equation)
 
     for series in request.series:
         if request.graph_type == "scatter":
             ax.scatter(series.x, series.y, label=series.label or "Series", s=42, color="#0f766e")
+        elif request.graph_type == "bar":
+            ax.bar(series.x, series.y, label=series.label or "Series", color="#0f766e", alpha=0.88, width=0.7)
+        elif request.graph_type == "histogram":
+            ax.hist(series.x, bins="auto", label=series.label or "Series", color="#0f766e", alpha=0.78, edgecolor="#0f172a")
+        elif request.graph_type == "area":
+            ax.plot(series.x, series.y, label=series.label or "Series", linewidth=2.2, color="#0f766e")
+            ax.fill_between(series.x, series.y, alpha=0.24, color="#0f766e")
         else:
             ax.plot(series.x, series.y, label=series.label or "Series", linewidth=2.2)
 
