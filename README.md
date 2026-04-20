@@ -8,13 +8,13 @@ Veridia is an AI-powered STEM learning workspace designed to support real academ
 
 ## Screenshots
 
-### Home Page
+**Home Page**
 
-![Home Page](./docs/screenshots/home-page.png)
+![Home Page](docs/images/home-page.png)
 
-### Application Interface
+**Application Interface**
 
-![Application Interface](./docs/screenshots/application-interface.png)
+![Application Interface](docs/images/application-interface.png)
 
 ## Features
 
@@ -49,7 +49,3 @@ Veridia is an AI-powered STEM learning workspace designed to support real academ
 ### Public Beta
 
 Veridia is currently in a public beta phase. The product is actively being refined through testing, iteration, and user feedback, and features may continue to evolve as the platform matures.
-
-## Author
-
-Aaron Nathans is an engineer focused on intelligent systems, AI-driven products, and turning technically complex ideas into real, usable software. Veridia reflects that approach: practical workflows, thoughtful product design, and engineering aimed at delivering clear value in use.
